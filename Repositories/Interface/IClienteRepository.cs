@@ -16,6 +16,7 @@ namespace Frenet.ShipManagement.Repositories.Interface
         /// <param name="cliente">Dados do cliente a ser criado</param>
         /// <returns>O cliente criado</returns>
         Task<Cliente> CreateCliente(ClienteDto cliente);
+        Task DeleteCliente(int id);
 
         /// <summary>
         /// Obtém um cliente específico pelo ID.
@@ -35,6 +36,6 @@ namespace Frenet.ShipManagement.Repositories.Interface
         /// </summary>
         /// <param name="cliente">Dados atualizados do cliente</param>
         /// <returns>O cliente atualizado</returns>
-        Task<Cliente> UpdateCliente(ClienteDto cliente);
+        Task<Cliente> UpdateCliente(ClienteDto cliente, int id);
     }
 }

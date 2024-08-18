@@ -1,0 +1,20 @@
+﻿using System;
+
+namespace Frenet.ShipManagement.Views.Dto
+{
+    /// <summary>
+    /// Representa a simulação com dados de origem e destino.
+    /// </summary>
+    public class SimulacaoDto
+    {
+        /// <summary>
+        /// Identificador da origem para a simulação.
+        /// </summary>
+        public int Origem { get; set; }
+
+        /// <summary>
+        /// Identificador do destino para a simulação.
+        /// </summary>
+        public int Destino { get; set; }
+    }
+}

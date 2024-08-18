@@ -14,13 +14,14 @@ namespace Frenet.ShipManagement.Services.Interface
         /// <param name="cliente">Dados do cliente a ser criado.</param>
         /// <returns>O cliente criado.</returns>
         Task<Cliente> CreateCliente(ClienteDto cliente);
-
+        Task DeleteCliente(int id);
+        
         /// <summary>
         /// Obtém um cliente com base no ID fornecido.
         /// </summary>
         /// <param name="id">ID do cliente.</param>
         /// <returns>O cliente correspondente ao ID fornecido.</returns>
-        Task<Cliente> GetClienteById(int id);
+        Task<IResult> GetClienteById(int id);
 
         /// <summary>
         /// Obtém a lista de todos os clientes.
@@ -33,6 +34,6 @@ namespace Frenet.ShipManagement.Services.Interface
         /// </summary>
         /// <param name="cliente">Dados atualizados do cliente.</param>
         /// <returns>O cliente atualizado.</returns>
-        Task<Cliente> UpdateCliente(ClienteDto cliente);
+        Task<Cliente> UpdateCliente(ClienteDto cliente, int id);
     }
 }

@@ -16,27 +16,26 @@ namespace Frenet.ShipManagement.Models
         /// <summary>
         /// Nome do cliente.
         /// </summary>
-        public string Nome { get; init; }
+        public string Nome { get; set; }
 
         /// <summary>
         /// Endereço físico do cliente.
         /// </summary>
-        public string Endereco { get; init; }
+        public string Endereco { get; set; }
 
         /// <summary>
         /// Número de telefone de contato do cliente.
         /// </summary>
-        public string Telefone { get; init; }
+        public string Telefone { get; set; }
 
         /// <summary>
         /// Endereço de e-mail do cliente.
         /// </summary>
-        public string Email { get; init; }
+        public string Email { get; set; }
 
         /// <summary>
         /// Lista de pedidos associados a este cliente.
         /// </summary>
-        [JsonIgnore]
         public ICollection<Pedido> Pedidos { get; init; }
     }
 }
