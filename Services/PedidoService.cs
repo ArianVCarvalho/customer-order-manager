@@ -9,10 +9,12 @@ namespace Frenet.ShipManagement.Services
     public class PedidoService : IPedidoService
     {
         private readonly IPedidoRepository pedidoRepository;
+        private readonly IShippingService _shippingService;
 
-        public PedidoService(IPedidoRepository repository)
+        public PedidoService(IPedidoRepository repository, IShippingService shippingService)
         {
             this.pedidoRepository = repository;
+            _shippingService = shippingService;
         }
         public async Task<List<Pedido>> GetPedidos()
         {
@@ -20,7 +22,24 @@ namespace Frenet.ShipManagement.Services
         }
         public async Task<Pedido> CreatePedido(PedidoDto pedido)
         {
-            return await pedidoRepository.CreatePedido(pedido);
+            var simulacao = new SimulacaoDto
+            {
+                Destino = pedido.Destino,
+                Origem = pedido.Origem,
+            };
+
+            var frete = _shippingService.CalcularFrete(simulacao);
+
+            var criarPedido = new Pedido
+            {
+                ClienteId = pedido.ClienteId,
+                Destino = pedido.Destino,
+                Status = pedido.Status,
+                Origem = pedido.Origem,
+                ValorFrete = frete.Result.Value.ShippingPrice
+            };
+
+            return await pedidoRepository.CreatePedido(criarPedido);
         }
 
         public async Task<Pedido> GetPedidoById(int id)

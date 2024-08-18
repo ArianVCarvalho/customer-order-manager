@@ -30,20 +30,12 @@ namespace Frenet.ShipManagement.Repositories
             return pedidos;
         }
 
-        public async Task<Pedido> CreatePedido(PedidoDto pedido)
-        {
-            var criarPedido = new Pedido
-            {
-                ClienteId = pedido.ClienteId,
-                Origem = pedido.Origem,
-                Destino = pedido.Destino,
-                Status = pedido.Status,
-            };
-
-            _context.Pedido.Add(criarPedido);
+        public async Task<Pedido> CreatePedido(Pedido pedido)
+        { 
+            _context.Pedido.Add(pedido);
             await _context.SaveChangesAsync();
 
-            return criarPedido;
+            return pedido;
         }
 
         public async Task<Pedido> GetPedidoById(int id)

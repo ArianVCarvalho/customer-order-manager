@@ -4,6 +4,7 @@ using Frenet.ShipManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Frenet.ShipManagement.Migrations
 {
     [DbContext(typeof(FrenetShipManagementContext))]
-    partial class FrenetShipManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20240818183733_UpdateVariables")]
+    partial class UpdateVariables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

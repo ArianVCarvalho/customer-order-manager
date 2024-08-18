@@ -5,7 +5,7 @@ namespace Frenet.ShipManagement.Repositories.Interface
 {
     public interface IPedidoRepository
     {
-        Task<Pedido> CreatePedido(PedidoDto pedido);
+        Task<Pedido> CreatePedido(Pedido pedido);
         Task<Pedido> GetPedidoById(int id);
         Task<List<Pedido>> GetPedidos();
         Task<List<Pedido>> GetPedidosByClienteId(int clienteId);

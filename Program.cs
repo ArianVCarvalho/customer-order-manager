@@ -23,6 +23,8 @@ builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IShippingService, ShippingService>();
+
 
 
 builder.Services.AddControllers().AddJsonOptions(options =>
