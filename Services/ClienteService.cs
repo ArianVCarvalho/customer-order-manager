@@ -38,14 +38,14 @@ namespace Frenet.ShipManagement.Services
         /// <param name="id">ID do cliente</param>
         /// <returns>O cliente correspondente ao ID</returns>
         /// <exception cref="KeyNotFoundException">Lançado quando o cliente não é encontrado</exception>
-        public async Task<Cliente> GetClienteById(int id)
+        public async Task<IResult> GetClienteById(int id)
         {
             var cliente = await repository.GetClienteById(id);
             if (cliente == null)
             {
-                throw new KeyNotFoundException("Cliente não encontrado.");
+                return Results.NotFound<string>("Cliente não encontrado");
             }
-            return cliente;
+            return Results.Ok<Cliente>(cliente);
         }
 
         /// <summary>
@@ -63,9 +63,14 @@ namespace Frenet.ShipManagement.Services
         /// </summary>
         /// <param name="cliente">Dados atualizados do cliente</param>
         /// <returns>O cliente atualizado</returns>
-        public async Task<Cliente> UpdateCliente(ClienteDto cliente)
+        public async Task<Cliente> UpdateCliente(ClienteDto cliente, int id)
         {
-            return await repository.UpdateCliente(cliente);
+            return await repository.UpdateCliente(cliente, id);
+        }
+
+        public async Task DeleteCliente(int id)
+        {
+            await repository.DeleteCliente(id);
         }
     }
 }

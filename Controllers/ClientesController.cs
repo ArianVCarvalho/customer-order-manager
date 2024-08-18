@@ -12,7 +12,7 @@ namespace Frenet.ShipManagement.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class ClientesController : Controller
+    public class ClientesController : ControllerBase
     {
         private readonly FrenetShipManagementContext _context;
         private readonly IClienteService _clienteService;
@@ -91,21 +91,17 @@ namespace Frenet.ShipManagement.Controllers
 
             if (ModelState.IsValid)
             {
-                var isCliente = _clienteService.GetClienteById(id);
-
-                if (isCliente is null || false)
-                    return NotFound();
 
                 try
                 {
-                    clienteUpdate = await _clienteService.UpdateCliente(cliente);
+                    clienteUpdate = await _clienteService.UpdateCliente(cliente, id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     throw new Exception("Erro ao salvar");
                 }
             }
-            return Ok($"Usuário atualizado: {clienteUpdate}");
+            return Ok($"Usuário atualizado: {clienteUpdate.Id}");
         }
 
         /// <summary>
@@ -116,14 +112,23 @@ namespace Frenet.ShipManagement.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
+
+            if (id == null || id == 0)
+            {
+                return BadRequest("ID inválido.");
+            }
+
             var cliente = await _context.Cliente.FindAsync(id);
             if (cliente != null)
             {
-                _context.Cliente.Remove(cliente);
-                await _context.SaveChangesAsync();
-            }
 
-            return RedirectToAction(nameof(Index));
+                await _clienteService.DeleteCliente(id);
+                return Ok($"Usuário {id} deletado");
+
+            }
+            return NotFound("Cliente não existe.");
+
+            
         }
     }
 }

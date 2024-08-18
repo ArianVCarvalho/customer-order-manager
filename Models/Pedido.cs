@@ -25,17 +25,26 @@ namespace Frenet.ShipManagement.Models
         /// <summary>
         /// Local de origem do pedido.
         /// </summary>
-        public string Origem { get; set; }
+        public int Origem { get; set; }
 
         /// <summary>
         /// Local de destino do pedido.
         /// </summary>
-        public string Destino { get; set; }
+        public int Destino { get; set; }
 
         /// <summary>
         /// Data de criação do pedido.
         /// </summary>
         public DateTime DataCriacao { get; init; }
 
+        ///<summary>
+        /// Status do pedido
+        /// </summary>
+        public Status Status { get; set; }
+
+        /// <summary>
+        /// Valor Total do Pedido
+        /// </summary>
+        public decimal ValorPedido { get; init; }
     }
 }
