@@ -25,12 +25,12 @@ namespace Frenet.ShipManagement.Models
         /// <summary>
         /// Local de origem do pedido.
         /// </summary>
-        public int Origem { get; set; }
+        public string Origem { get; set; }
 
         /// <summary>
         /// Local de destino do pedido.
         /// </summary>
-        public int Destino { get; set; }
+        public string Destino { get; set; }
 
         /// <summary>
         /// Data de criação do pedido.
@@ -45,6 +45,6 @@ namespace Frenet.ShipManagement.Models
         /// <summary>
         /// Valor Total do Pedido
         /// </summary>
-        public decimal ValorPedido { get; init; }
+        public decimal ValorFrete { get; init; }
     }
 }

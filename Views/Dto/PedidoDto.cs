@@ -16,12 +16,12 @@ namespace Frenet.ShipManagement.Views.Dto
         /// <summary>
         /// Cep Local de origem do pedido.
         /// </summary>
-        public int Origem { get; set; }
+        public string Origem { get; set; }
 
         /// <summary>
         /// Cep de destino do pedido.
         /// </summary>
-        public int Destino { get; set; }
+        public string Destino { get; set; }
 
         /// <summary>
         /// Status atual do pedido.

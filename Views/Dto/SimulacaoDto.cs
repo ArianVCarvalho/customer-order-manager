@@ -10,11 +10,11 @@ namespace Frenet.ShipManagement.Views.Dto
         /// <summary>
         /// Identificador da origem para a simulação.
         /// </summary>
-        public int Origem { get; set; }
+        public string Origem { get; set; }
 
         /// <summary>
         /// Identificador do destino para a simulação.
         /// </summary>
-        public int Destino { get; set; }
+        public string Destino { get; set; }
     }
 }
