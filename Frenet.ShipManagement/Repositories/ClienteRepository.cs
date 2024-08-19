@@ -47,7 +47,7 @@ namespace Frenet.ShipManagement.Repositories
         /// </summary>
         /// <param name="cliente">Dados do cliente a ser criado</param>
         /// <returns>O cliente criado</returns>
-        async Task<Cliente> IClienteRepository.CreateCliente(ClienteDto cliente)
+        public async Task<Cliente> CreateCliente(ClienteDto cliente)
         {
             var criarCliente = new Cliente
             {
@@ -68,7 +68,7 @@ namespace Frenet.ShipManagement.Repositories
         /// </summary>
         /// <param name="cliente">Dados atualizados do cliente</param>
         /// <returns>O cliente atualizado</returns>
-        async Task<Cliente> IClienteRepository.UpdateCliente(ClienteDto cliente, int id)
+        public async Task<Cliente> UpdateCliente(ClienteDto cliente, int id)
         {
             var updateCliente = await _context.Cliente.FindAsync(id);
 
@@ -86,7 +86,7 @@ namespace Frenet.ShipManagement.Repositories
             return updateCliente;
         }
 
-        async Task IClienteRepository.DeleteCliente(int id)
+        public async Task DeleteCliente(int id)
         {
             var cliente = await GetClienteById(id);
 
@@ -103,7 +103,6 @@ namespace Frenet.ShipManagement.Repositories
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                // Aqui você pode lidar com a exceção de concorrência, por exemplo, retornando uma mensagem ao usuário
                 throw new DbUpdateConcurrencyException("Falha na exclusão devido a uma modificação concorrente. Tente novamente.", ex);
             }
         }

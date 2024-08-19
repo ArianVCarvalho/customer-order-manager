@@ -21,11 +21,5 @@ namespace Frenet.ShipManagement.Views.Request
         /// Representa o código postal do local para onde o pedido deve ser entregue.
         /// </summary>
         public string Destino { get; set; }
-
-        /// <summary>
-        /// Status atual do pedido.
-        /// Indica o estado atual do pedido, como "Em Processamento", "Enviado", "Entregue", etc.
-        /// </summary>
-        public Status Status { get; set; }
     }
 }

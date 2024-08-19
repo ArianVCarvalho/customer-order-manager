@@ -60,6 +60,17 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Sistema de Gerenciamento de Pedidos para Logística",
+        Version = "v1",
+        Description = "Desenvolver uma aplicação de gerenciamento de pedidos que permita a criação, " +
+        "atualização, visualização e exclusão de pedidos de transporte. O sistema deve incluir funcionalidades para gerenciar informações de clientes, " +
+        "status de pedidos e integração com um serviço de terceiros para cálculo de frete."
+    });
+
+    // Personalize a aparência dos parâmetros
+    c.DescribeAllParametersInCamelCase();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Insira o JWT Bearer token no campo abaixo usando o formato **Bearer {token}**",

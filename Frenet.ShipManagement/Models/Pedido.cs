@@ -43,6 +43,6 @@
         /// <summary>
         /// Valor Total do Pedido
         /// </summary>
-        public decimal ValorFrete { get; init; }
+        public decimal ValorFrete { get; set; }
     }
 }
