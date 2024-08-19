@@ -15,7 +15,7 @@ namespace Frenet.ShipManagement.Services.Interface
         /// <returns>O cliente criado.</returns>
         Task<Cliente> CreateCliente(ClienteDto cliente);
         Task DeleteCliente(int id);
-        
+
         /// <summary>
         /// Obtém um cliente com base no ID fornecido.
         /// </summary>

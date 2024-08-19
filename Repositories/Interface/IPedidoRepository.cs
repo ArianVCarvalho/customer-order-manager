@@ -1,5 +1,7 @@
 ﻿using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Views.Dto;
+using Frenet.ShipManagement.Views.Request;
+using Frenet.ShipManagement.Views.Response;
 
 namespace Frenet.ShipManagement.Repositories.Interface
 {
@@ -7,8 +9,8 @@ namespace Frenet.ShipManagement.Repositories.Interface
     {
         Task<Pedido> CreatePedido(Pedido pedido);
         Task<Pedido> GetPedidoById(int id);
-        Task<List<Pedido>> GetPedidos();
-        Task<List<Pedido>> GetPedidosByClienteId(int clienteId);
-        Task <Pedido> UpdatePedido(int id, PedidoDto pedido);
+        Task<List<PedidoResponse>> GetPedidos();
+        Task<List<PedidoResponse>> GetPedidosByClienteId(int clienteId);
+        Task<Pedido> UpdatePedido(int id, PedidoRequest pedido);
     }
 }

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Frenet.ShipManagement.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Frenet.ShipManagement.Data
 {
     public class FrenetShipManagementContext : DbContext
     {
-        public FrenetShipManagementContext (DbContextOptions<FrenetShipManagementContext> options)
+        public FrenetShipManagementContext(DbContextOptions<FrenetShipManagementContext> options)
             : base(options)
         {
         }

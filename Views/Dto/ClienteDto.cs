@@ -1,6 +1,4 @@
-﻿using Frenet.ShipManagement.Models;
-
-namespace Frenet.ShipManagement.Views.Dto
+﻿namespace Frenet.ShipManagement.Views.Dto
 {
     public class ClienteDto
     {

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Frenet.ShipManagement.Data;
+﻿using Frenet.ShipManagement.Data;
 using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Views.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Frenet.ShipManagement.Controllers
 {
@@ -12,6 +13,7 @@ namespace Frenet.ShipManagement.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ClientesController : ControllerBase
     {
         private readonly FrenetShipManagementContext _context;
@@ -21,11 +23,11 @@ namespace Frenet.ShipManagement.Controllers
         /// Inicializa uma nova instância do controlador de clientes.
         /// </summary>
         /// <param name="context">Contexto do banco de dados</param>
+        /// <param name="clienteService">Serviço de clientes</param>
         public ClientesController(FrenetShipManagementContext context, IClienteService clienteService)
         {
             _context = context;
             _clienteService = clienteService;
-
         }
 
         /// <summary>
@@ -33,9 +35,20 @@ namespace Frenet.ShipManagement.Controllers
         /// </summary>
         /// <returns>Lista de clientes</returns>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<ClienteDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Index()
         {
-            return Ok(await _clienteService.GetClientesAsync());
+            try
+            {
+                var clientes = await _clienteService.GetClientesAsync();
+                return Ok(clientes);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter clientes.");
+            }
         }
 
         /// <summary>
@@ -44,20 +57,32 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="id">ID do cliente</param>
         /// <returns>Detalhes do cliente</returns>
         [HttpGet("{id:int}/detalhe")]
+        [ProducesResponseType(typeof(ClienteDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+            if (id <= 0)
             {
-                return NotFound();
+                return BadRequest("ID inválido.");
             }
 
-            var cliente = await _clienteService.GetClienteById(id);
-            if (cliente == null)
+            try
             {
-                return NotFound();
-            }
+                var cliente = await _clienteService.GetClienteById(id);
+                if (cliente == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(cliente);
+                return Ok(cliente);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter detalhes do cliente.");
+            }
         }
 
         /// <summary>
@@ -66,16 +91,26 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="clienteDto">Dados do cliente</param>
         /// <returns>Resultado da criação</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]ClienteDto clienteDto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Create([FromBody] ClienteDto clienteDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var cliente = _clienteService.CreateCliente(clienteDto);
-
-                //TODO: Entender serialização do retorno
-                return Ok("Usuário salvo");
+                return BadRequest(ModelState);
             }
-            return BadRequest();
+
+            try
+            {
+                await _clienteService.CreateCliente(clienteDto);
+                return Ok("Cliente salvo");
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao criar cliente.");
+            }
         }
 
         /// <summary>
@@ -85,23 +120,32 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="cliente">Dados atualizados do cliente</param>
         /// <returns>Resultado da atualização</returns>
         [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(ClienteDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Edit(int id, [FromBody] ClienteDto cliente)
         {
-            Cliente clienteUpdate = null;
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-
-                try
-                {
-                    clienteUpdate = await _clienteService.UpdateCliente(cliente, id);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    throw new Exception("Erro ao salvar");
-                }
+                return BadRequest(ModelState);
             }
-            return Ok($"Usuário atualizado: {clienteUpdate.Id}");
+
+            try
+            {
+                var clienteUpdate = await _clienteService.UpdateCliente(cliente, id);
+                if (clienteUpdate == null)
+                {
+                    return NotFound($"Cliente com ID {id} não encontrado.");
+                }
+
+                return Ok($"Cliente atualizado: {clienteUpdate.Id}");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar cliente.");
+            }
         }
 
         /// <summary>
@@ -110,25 +154,33 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="id">ID do cliente a ser excluído</param>
         /// <returns>Resultado da exclusão</returns>
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
-
-            if (id == null || id == 0)
+            if (id <= 0)
             {
                 return BadRequest("ID inválido.");
             }
 
-            var cliente = await _context.Cliente.FindAsync(id);
-            if (cliente != null)
+            try
             {
+                var cliente = await _context.Cliente.FindAsync(id);
+                if (cliente == null)
+                {
+                    return NotFound("Cliente não encontrado.");
+                }
 
                 await _clienteService.DeleteCliente(id);
-                return Ok($"Usuário {id} deletado");
-
+                return Ok($"Cliente {id} deletado");
             }
-            return NotFound("Cliente não existe.");
-
-            
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao excluir cliente.");
+            }
         }
     }
 }

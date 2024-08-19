@@ -1,50 +1,96 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Frenet.ShipManagement.Data;
-using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Repositories;
-using Frenet.ShipManagement.Services.Interface;
+using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services;
+using Frenet.ShipManagement.Services.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configura o contexto do banco de dados
 builder.Services.AddDbContext<FrenetShipManagementContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FrenetShipManagementContext") ?? throw new InvalidOperationException("Connection string 'FrenetShipManagementContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FrenetShipManagementContext")
+    ?? throw new InvalidOperationException("Connection string 'FrenetShipManagementContext' not found.")));
 
-// Add services to the container.
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+// Configura autenticação JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
+// Registra serviços e repositórios
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
-builder.Services.AddScoped<IShippingService, ShippingService>();
 
+// Registra o HttpClient para o ShippingService
+builder.Services.AddHttpClient<IShippingService, ShippingService>();
 
+builder.Services.AddScoped<TokenService>();
 
+// Configuração para usar camelCase e ignorar valores nulos no JSON
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-}); ;
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+});
+
+// Configuração do Swagger para documentação da API
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Insira o JWT Bearer token no campo abaixo usando o formato **Bearer {token}**",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    // Adiciona o requisito de segurança globalmente
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+        {
+            new OpenApiSecurityScheme{
+                Reference = new OpenApiReference{
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            new List<string>()
+        }
+    });
+
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    Console.WriteLine($"XML Documentation Path: {xmlPath}");
     c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure o pipeline de requisição HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -53,6 +99,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Ativa autenticação e autorização
+app.UseAuthentication();  // Certifique-se de que este middleware seja usado
 app.UseAuthorization();
 
 app.MapControllers();

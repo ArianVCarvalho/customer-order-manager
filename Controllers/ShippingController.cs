@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Views.Dto;
-using Frenet.ShipManagement.Services.Interface;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Frenet.ShipManagement.Controllers
 {

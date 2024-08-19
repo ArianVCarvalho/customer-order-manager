@@ -1,7 +1,5 @@
 ﻿using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Views.Dto;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Frenet.ShipManagement.Repositories.Interface
 {
