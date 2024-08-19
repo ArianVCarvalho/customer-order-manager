@@ -2,8 +2,6 @@
 using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Views.Dto;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Frenet.ShipManagement.Services
 {

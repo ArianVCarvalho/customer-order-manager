@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Frenet.ShipManagement.Views.Dto
+﻿namespace Frenet.ShipManagement.Views.Dto
 {
     /// <summary>
     /// Representa a simulação com dados de origem e destino.

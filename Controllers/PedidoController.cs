@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Frenet.ShipManagement.Data;
+using Frenet.ShipManagement.Services.Interface;
+using Frenet.ShipManagement.Views.Dto;
+using Frenet.ShipManagement.Views.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Frenet.ShipManagement.Data;
-using Frenet.ShipManagement.Models;
-using Frenet.ShipManagement.Views.Dto;
-using Frenet.ShipManagement.Services.Interface;
 
 namespace Frenet.ShipManagement.Controllers
 {
@@ -16,6 +13,7 @@ namespace Frenet.ShipManagement.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class PedidoController : ControllerBase
     {
         private readonly FrenetShipManagementContext _context;
@@ -40,15 +38,27 @@ namespace Frenet.ShipManagement.Controllers
         }
 
         /// <summary>
-        /// Obtém todos os pedidos.
+        /// Obtém os 10 pedidos mais recentes.
         /// </summary>
         /// <returns>Uma lista de pedidos, incluindo os dados de clientes associados.</returns>
         /// <response code="200">Retorna a lista de pedidos.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<PedidoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPedidos()
         {
-            var pedidos = await _context.Pedido.Include(p => p.Cliente).ToListAsync();
-            return Ok(pedidos);
+            try
+            {
+                var pedidos = await _pedidoService.GetPedidos();
+                return Ok(pedidos);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter pedidos.");
+            }
         }
 
         /// <summary>
@@ -57,18 +67,31 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="id">O ID do pedido.</param>
         /// <returns>Os detalhes do pedido, incluindo os dados do cliente associado.</returns>
         /// <response code="200">Retorna os detalhes do pedido.</response>
-        /// <response code="404">Se o pedido não for encontrado.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Pedido não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(PedidoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Details(int id)
         {
-            var pedido = await _pedidoService.GetPedidoById(id);
-
-            if (pedido == null)
+            try
             {
-                return NotFound("Pedido não encontrado.");
-            }
+                var pedido = await _pedidoService.GetPedidoById(id);
 
-            return Ok(pedido);
+                if (pedido == null)
+                {
+                    return NotFound("Pedido não encontrado.");
+                }
+
+                return Ok(pedido);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter detalhes do pedido.");
+            }
         }
 
         /// <summary>
@@ -77,25 +100,38 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="id">O ID do cliente.</param>
         /// <returns>O pedido relacionado ao cliente.</returns>
         /// <response code="200">Retorna o pedido associado ao cliente.</response>
-        /// <response code="404">Se nenhum pedido/cliente for encontrado para o cliente.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Nenhum pedido encontrado para o cliente.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpGet("{id:int}/cliente")]
+        [ProducesResponseType(typeof(IEnumerable<PedidoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPedidosByClienteId(int id)
         {
-            var cliente = await _clienteService.GetClienteById(id);
-
-            if (cliente == null)
+            try
             {
-                return NotFound("ID do cliente não foi encontrado.");
+                var cliente = await _clienteService.GetClienteById(id);
+
+                if (cliente == null)
+                {
+                    return NotFound("ID do cliente não foi encontrado.");
+                }
+
+                var pedido = await _pedidoService.GetPedidosByClienteId(id);
+
+                if (pedido == null || pedido.Count == 0)
+                {
+                    return NotFound("Nenhum pedido encontrado para o cliente com o ID fornecido.");
+                }
+
+                return Ok(pedido);
             }
-
-            var pedido = await _pedidoService.GetPedidosByClienteId(id);
-
-            if (pedido == null || pedido.Count == 0)
+            catch
             {
-                return NotFound("Nenhum pedido encontrado para o cliente com o ID fornecido.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter pedidos do cliente.");
             }
-
-            return Ok(pedido);
         }
 
         /// <summary>
@@ -104,20 +140,39 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="pedido">O DTO contendo os dados do pedido a ser criado.</param>
         /// <returns>O pedido criado.</returns>
         /// <response code="200">Retorna o pedido criado.</response>
-        /// <response code="400">Se os dados do pedido não forem válidos.</response>
-        /// <response code="404">Se o cliente associado ao pedido não for encontrado.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Cliente não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PedidoDto pedido)
+        [ProducesResponseType(typeof(PedidoRequest), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Create([FromBody] PedidoRequest pedido)
         {
-            var cliente = await _clienteService.GetClienteById(pedido.ClienteId);
-
-            if (ModelState.IsValid)
+            try
             {
-                await _pedidoService.CreatePedido(pedido);
-                return Ok(pedido);
-            }
+                var cliente = await _clienteService.GetClienteById(pedido.ClienteId);
 
-            return BadRequest(ModelState);
+                if (cliente == null)
+                {
+                    return NotFound("Cliente não encontrado.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    await _pedidoService.CreatePedido(pedido);
+                    return Ok(pedido);
+                }
+
+                return BadRequest(ModelState);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao criar pedido.");
+            }
         }
 
         /// <summary>
@@ -127,71 +182,80 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="pedido">O DTO contendo os dados atualizados do pedido.</param>
         /// <returns>O pedido atualizado.</returns>
         /// <response code="200">Retorna o pedido atualizado.</response>
-        /// <response code="400">Se os dados do pedido não forem válidos ou o ID não corresponder.</response>
-        /// <response code="404">Se o pedido não for encontrado.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Pedido não encontrado.</response>
+        /// <response code="409">Concorrência detectada.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Edit(int id, [FromBody] PedidoDto pedido)
+        [ProducesResponseType(typeof(PedidoRequest), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Edit(int id, [FromBody] PedidoRequest pedido)
         {
-            var isPedido = await _pedidoService.GetPedidoById(id);
-
-            if (isPedido == null)
+            try
             {
-                return NotFound("Pedido não existe.");
-            }
+                var isPedido = await _pedidoService.GetPedidoById(id);
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (isPedido == null)
                 {
-                    // Atualiza o pedido
+                    return NotFound("Pedido não existe.");
+                }
+
+                if (ModelState.IsValid)
+                {
                     await _pedidoService.UpdatePedido(id, pedido);
                     return Ok(pedido);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    // Exceção lançada em caso de concorrência
-                    return Conflict("Houve um problema com a atualização. O pedido pode ter sido modificado por outro usuário.");
-                }
-                catch (Exception ex)
-                {
-                    // Captura e loga a exceção genérica
-                    // LogException(ex); // Método de logging hipotético
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
-                }
-            }
 
-            return Ok($"{pedido} atualizado com sucesso.");
+                return BadRequest(ModelState);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Conflict("Houve um problema com a atualização. O pedido pode ter sido modificado por outro usuário.");
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
         }
+
         /// <summary>
         /// Exclui um pedido pelo ID.
         /// </summary>
         /// <param name="id">O ID do pedido a ser excluído.</param>
         /// <returns>Uma resposta indicando o sucesso ou falha da exclusão.</returns>
-        /// <response code="200">Se a exclusão for bem-sucedida.</response>
-        /// <response code="404">Se o pedido não for encontrado.</response>
+        /// <response code="200">Exclusão bem-sucedida.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Pedido não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
-            var pedido = await _context.Pedido.FindAsync(id);
-
-            if (pedido != null)
+            try
             {
+                var pedido = await _context.Pedido.FindAsync(id);
+
+                if (pedido == null)
+                {
+                    return NotFound("Pedido não encontrado.");
+                }
+
                 _context.Pedido.Remove(pedido);
                 await _context.SaveChangesAsync();
                 return Ok($"Pedido {pedido.Id} deletado com sucesso");
             }
-
-            return NotFound("Pedido não encontrado.");
-        }
-
-        /// <summary>
-        /// Verifica se um pedido existe no banco de dados.
-        /// </summary>
-        /// <param name="id">O ID do pedido.</param>
-        /// <returns>Verdadeiro se o pedido existe, falso caso contrário.</returns>
-        private bool PedidoExists(int id)
-        {
-            return _context.Pedido.Any(e => e.Id == id);
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao excluir pedido.");
+            }
         }
     }
 }

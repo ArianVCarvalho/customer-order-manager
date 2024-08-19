@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Frenet.ShipManagement.Models
+﻿namespace Frenet.ShipManagement.Models
 {
     /// <summary>
     /// Representa um pedido no sistema de gestão de envios.

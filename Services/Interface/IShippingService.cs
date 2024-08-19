@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Frenet.ShipManagement.Views;
+﻿using Frenet.ShipManagement.Views;
 using Frenet.ShipManagement.Views.Dto;
 using Frenet.ShipManagement.Views.Response;
 

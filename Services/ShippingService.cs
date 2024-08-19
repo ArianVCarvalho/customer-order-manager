@@ -1,14 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Frenet.ShipManagement.Views.Response;
-using Frenet.ShipManagement.Views.Dto;
-using Frenet.ShipManagement.Views;
-using Frenet.ShipManagement.Services.Interface;
+﻿using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Validators;
-using static Frenet.ShipManagement.Models.ShippingResponse;
+using Frenet.ShipManagement.Views;
+using Frenet.ShipManagement.Views.Dto;
+using Frenet.ShipManagement.Views.Response;
+using static Frenet.ShipManagement.Models.ShippingResponseFrenet;
 
 namespace Frenet.ShipManagement.Services
 {

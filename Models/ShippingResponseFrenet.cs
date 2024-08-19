@@ -1,6 +1,6 @@
 ﻿namespace Frenet.ShipManagement.Models
 {
-    public class ShippingResponse
+    public class ShippingResponseFrenet
     {
         public class ShippingResponseWrapper
         {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace Frenet.ShipManagement.Models
+﻿namespace Frenet.ShipManagement.Models
 {
     /// <summary>
     /// Representa um cliente no sistema de gestão de envios.
