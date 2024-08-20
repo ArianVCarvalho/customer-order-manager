@@ -1,4 +1,5 @@
 ﻿using Frenet.ShipManagement.Data;
+using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Views.Dto;
 using Frenet.ShipManagement.Views.Request;
@@ -220,6 +221,45 @@ namespace Frenet.ShipManagement.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
+        }
+
+        /// <summary>
+        /// Atualiza o status de um pedido existente.
+        /// </summary>
+        /// <param name="id">O ID do pedido a ser atualizado.</param>
+        /// <param name="status">O novo status do pedido.</param>
+        /// <returns>Uma resposta indicando o sucesso ou falha da atualização do status.</returns>
+        /// <response code="200">Status atualizado com sucesso.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="401">Acesso não autorizado.</response>
+        /// <response code="404">Pedido não encontrado.</response>
+        /// <response code="500">Erro interno do servidor.</response>
+        [HttpPut("{id:int}/status")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] Status status)
+        {
+            try
+            {
+                var pedido = await _pedidoService.GetPedidoById(id);
+
+                if (pedido == null)
+                {
+                    return NotFound("Pedido não encontrado.");
+                }
+
+                pedido.Status = status;
+                await _pedidoService.UpdateStatus(id, status);
+
+                return Ok($"Status do pedido {pedido.Id} atualizado para {pedido.Status}.");
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar status do pedido.");
             }
         }
 

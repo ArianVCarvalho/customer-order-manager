@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 public class TokenService
 {
@@ -11,14 +9,17 @@ public class TokenService
 
     public TokenService(IConfiguration configuration)
     {
-        _configuration = configuration;
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
+        var key = _configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(key))
+        {
+            throw new ArgumentException("JWT Key não configurada.", nameof(key));
+        }
     }
 
-    public string GenerateToken()
+    public string GenerateToken(string clientIdentifier = "defaultClientIdentifier")
     {
-        // Use um identificador fixo ou gere um identificador aqui
-        var clientIdentifier = "defaultClientIdentifier"; // Substitua conforme necessário
-
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, clientIdentifier),

@@ -54,7 +54,7 @@ namespace Frenet.ShipManagement.Services
             {
                 ClienteId = pedido.ClienteId,
                 Destino = pedido.Destino,
-                Status = pedido.Status,
+                Status = Status.Processamento,
                 Origem = pedido.Origem,
                 ValorFrete = frete.Value.ShippingPrice // Corrigido para acessar o valor corretamente
             };
@@ -90,7 +90,19 @@ namespace Frenet.ShipManagement.Services
         /// <returns>O objeto <see cref="Pedido"/> atualizado.</returns>
         public async Task<Pedido> UpdatePedido(int id, PedidoRequest pedido)
         {
-            return await pedidoRepository.UpdatePedido(id, pedido);
+            var simulacao = new SimulacaoDto
+            {
+                Destino = pedido.Destino,
+                Origem = pedido.Origem,
+            };
+
+            var frete = await _shippingService.CalcularFrete(simulacao);
+
+            return await pedidoRepository.UpdatePedido(id, pedido, frete.Value.ShippingPrice);
+        }
+        public async Task<Pedido> UpdateStatus(int id, Status status)
+        {
+            return await pedidoRepository.UpdateStatus(id, status);
         }
     }
 }

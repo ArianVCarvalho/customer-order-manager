@@ -69,11 +69,7 @@ namespace Frenet.ShipManagement.Repositories
         /// <returns>Pedido com o ID especificado</returns>
         public async Task<Pedido> GetPedidoById(int id)
         {
-            var pedido = await _context.Pedido
-                .Include(p => p.Cliente)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            return pedido;
+            return await _context.Pedido.FirstOrDefaultAsync(m => m.Id == id);
         }
 
         /// <summary>
@@ -84,13 +80,12 @@ namespace Frenet.ShipManagement.Repositories
         public async Task<List<PedidoResponse>> GetPedidosByClienteId(int clienteId)
         {
             var pedidos = await _context.Pedido
-                .Include(p => p.Cliente)
                 .Where(p => p.ClienteId == clienteId)
                 .ToListAsync();
 
             var pedidoResponses = pedidos.Select(pedido => new PedidoResponse
             {
-                ClienteId = pedido.ClienteId, 
+                ClienteId = pedido.ClienteId,
                 Pedido = new PedidoDto
                 {
                     Id = pedido.Id,
@@ -101,6 +96,7 @@ namespace Frenet.ShipManagement.Repositories
                     ValorFrete = pedido.ValorFrete
                 }
             }).ToList();
+
             return pedidoResponses;
         }
 
@@ -110,7 +106,7 @@ namespace Frenet.ShipManagement.Repositories
         /// <param name="id">ID do pedido a ser atualizado</param>
         /// <param name="pedidoDto">Objeto PedidoDto contendo os novos dados</param>
         /// <returns>Pedido atualizado</returns>
-        public async Task<Pedido> UpdatePedido(int id, PedidoRequest pedidoDto)
+        public async Task<Pedido> UpdatePedido(int id, PedidoRequest pedidoDto, decimal frete)
         {
             var pedidoExistente = await _context.Pedido.FindAsync(id);
 
@@ -121,7 +117,23 @@ namespace Frenet.ShipManagement.Repositories
 
             pedidoExistente.Destino = pedidoDto.Destino;
             pedidoExistente.Origem = pedidoDto.Origem;
-            pedidoExistente.Status = pedidoDto.Status;
+            pedidoExistente.ValorFrete = frete;
+
+            _context.Pedido.Update(pedidoExistente);
+            await _context.SaveChangesAsync();
+
+            return pedidoExistente;
+        }
+        public async Task<Pedido> UpdateStatus(int id, Status status)
+        {
+            var pedidoExistente = await _context.Pedido.FindAsync(id);
+
+            if (pedidoExistente == null)
+            {
+                return null;
+            }
+
+            pedidoExistente.Status = status;
 
             _context.Pedido.Update(pedidoExistente);
             await _context.SaveChangesAsync();
