@@ -1,5 +1,164 @@
 
+# Sistema de Gerenciamento de Pedidos para Logística
 
+Este projeto é um sistema para gerenciamento de pedidos de transporte, incluindo funcionalidades para criar, atualizar, visualizar e excluir pedidos, além de gerenciar informações de clientes e calcular o frete através de uma API externa.
+
+## Pré-Requisitos
+
+Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurados:
+
+- **.NET SDK** instalado (versão compatível com seu projeto, preferencialmente .NET 8).
+- **Banco de dados SQL Server** configurado e acessível.
+- **NLog** configurado para logging.
+
+## Configuração do Ambiente
+
+1. **Crie o arquivo `appsettings.json`** na raiz do projeto com o seguinte conteúdo:
+
+    ```json
+    {
+      "ConnectionStrings": {
+        "FrenetShipManagementContext": "Server=seu_servidor;Database=seu_banco_de_dados;User Id=seu_usuario;Password=sua_senha;"
+      },
+      "Authentication": {
+        "Secret": "sua_chave_secreta_base64",
+        "Issuer": "seu_emissor",
+        "Audience": "seu_publico"
+      }
+    }
+    ```
+
+    Substitua os valores pelos detalhes do seu banco de dados e as configurações do JWT.
+
+2. **Configure o NLog**
+
+   O NLog está configurado para registrar mensagens no console. Certifique-se de que o arquivo `NLog.config` ou as configurações de log estejam apropriados para o seu ambiente.
+
+## Configuração do Banco de Dados
+
+1. **Crie o banco de dados** SQL Server se ainda não existir.
+2. **Configure a conexão** com o banco de dados no arquivo `appsettings.json`.
+
+## Inicialização do Projeto
+
+1. **Restaure os pacotes NuGet**:
+
+    Abra o terminal ou prompt de comando e navegue até o diretório do projeto. Execute o seguinte comando:
+
+    ```bash
+    dotnet restore
+    ```
+
+2. **Crie e aplique as migrações** se estiver usando Entity Framework:
+
+    ```bash
+    dotnet ef migrations add InitialCreate
+    dotnet ef database update
+    ```
+
+
+3. **Compile o projeto**:
+
+    ```bash
+    dotnet build
+    ```
+
+4. **Execute a aplicação**:
+
+    ```bash
+    dotnet run
+    ```
+
+## Verificação
+
+1. **Acesse a Swagger UI** (se em ambiente de desenvolvimento) para verificar a documentação da API:
+
+    Navegue até `https://localhost:5001/swagger` ou o endpoint definido no `app.UseSwaggerUI()`.
+
+2. **Teste as rotas da API** usando ferramentas como Postman ou diretamente na interface Swagger para garantir que tudo esteja funcionando conforme esperado.
+
+## Acesso à Aplicação
+
+Para obter um JWT e acessar a aplicação, siga estas etapas:
+
+1. **Faça login** usando as credenciais padrão hardcoded no código-fonte:
+
+   - **Email**: `uncle.bob@frenet.com.br`
+   - **Senha**: `QK8uZ*ZorO46`
+
+   Faça uma requisição POST para o endpoint de autenticação, normalmente algo como `/api/login`. Você receberá um token JWT em resposta.
+
+2. **Use o JWT** obtido para acessar as rotas protegidas da API. Adicione o token ao cabeçalho de autorização das suas requisições usando o formato `{token}`.
+
+
+## Logging e Monitoramento
+
+- **Verifique os logs** gerados no console para assegurar que a aplicação está registrando informações corretamente.
+- 
+---
+## Testes Unitários
+
+Este projeto utiliza testes unitários para garantir que as funcionalidades dos serviços. Para configurar e executar os testes, siga as etapas abaixo.
+
+### Configuração dos Testes
+
+1. **Certifique-se de que todas as dependências estão instaladas ao acessar o projeto de teste**:
+   O projeto utiliza o framework `xUnit` e a biblioteca `FluentAssertions` para os testes unitários. As dependências podem ser instaladas com os seguintes comandos:
+
+   ```bash
+   dotnet add package xunit
+   dotnet add package FluentAssertions
+   dotnet add package Moq
+   ````
+    ou
+    ```bash
+   dotnet restore
+    ```
+
+ 2.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+    ```bash
+        dotnet build
+    ```
+ 3. Acesse o projeto `Frenet.ShipManagement.UnitTests` e execute
+    ```bash
+     dotnet test
+     ```
+---
+# Documentação para Rodar Testes de Integração - ClienteRepository
+
+Esta documentação fornece instruções para executar os testes de integração no projeto.
+
+## Requisitos
+
+Antes de executar os testes de integração, certifique-se de que você tenha o seguinte configurado:
+
+- **.NET SDK** instalado (preferencialmente .NET 8).
+- **Docker** instalado e em execução para suportar o Testcontainers.
+- **Testcontainers.MsSql** e outras dependências de teste devem estar incluídas no projeto.
+
+## Configuração do Ambiente
+
+1. **Instale as Dependências do Projeto**
+
+   Certifique-se de que todas as dependências necessárias para os testes estão instaladas. Execute o seguinte comando no diretório do projeto:
+
+   ```bash
+   dotnet restore
+    ```
+2. Configure o Docker
+    Testcontainers usa Docker para criar um contêiner SQL Server. Verifique se o Docker está instalado e em execução no seu sistema.
+
+3. Executando
+ Compile o projeto   Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+    ```bash       dotnet build
+      ```
+4. Execute os testes
+    Use o seguinte comando para rodar os testes de integração com xUnit:
+    ```bash       dotnet build
+      ```
+
+
+---
 # Tecnologias 
 - **Linguagem de Programação:** C#
 - **Framework:** .NET 8.0
@@ -25,7 +184,7 @@
 2. **Ao desenvolver uma API RESTful em ASP.NET Core, qual código de resposta HTTP deve ser retornado para uma requisição de recurso que não foi encontrado?**
    - a) 200 OK
    - b) 400 Bad Request
-   -**c) 404 Not Found**
+   - **c) 404 Not Found**
    - d) 500 Internal Server Error
 
 3. **No contexto de APIs RESTful, o que significa o termo "Idempotência"?**
