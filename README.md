@@ -110,21 +110,22 @@ Este projeto utiliza testes unitários para garantir que as funcionalidades dos s
    dotnet add package FluentAssertions
    dotnet add package Moq
    ````
-    ou
-    ```bash
-   dotnet restore
-    ```
 
- 2.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+    ou
+
     ```bash
-        dotnet build
-    ```
+    dotnet restore
+    ```  
+ 2.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+     ```bash
+     dotnet build
+     ```
  3. Acesse o projeto `Frenet.ShipManagement.UnitTests` e execute
     ```bash
      dotnet test
      ```
 ---
-# Documentação para Rodar Testes de Integração - ClienteRepository
+# Documentação para Rodar Testes de Integração
 
 Esta documentação fornece instruções para executar os testes de integração no projeto.
 
@@ -154,7 +155,7 @@ Antes de executar os testes de integração, certifique-se de que você tenha o seg
       ```
 4. Execute os testes
     Use o seguinte comando para rodar os testes de integração com xUnit:
-    ```bash       dotnet build
+    ```bash       dotnet test
       ```
 
 
