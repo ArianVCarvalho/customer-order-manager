@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{43A57284-99A3-4973-A7A1-03C3896F8F78}"
+	ProjectSection(SolutionItems) = preProject
+		src\Frenet.ShipManagement\nlog.config = src\Frenet.ShipManagement\nlog.config
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AD869F2E-820B-4F0C-8FC0-64359C265BF5}"
 EndProject
@@ -12,9 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frenet.ShipManagement.UnitTests", "tests\Frenet.ShipManagement.UnitTests\Frenet.ShipManagement.UnitTests.csproj", "{4A9E3828-9CA2-415B-8E39-3E3AEDA82DE8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11A7254A-0639-4D26-89DF-0A45F923B1CA}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frenet.ShipManagement.IntegrationTests", "tests\Frenet.ShipManagement.IntegrationTests\Frenet.ShipManagement.IntegrationTests.csproj", "{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +33,10 @@ Global
 		{4A9E3828-9CA2-415B-8E39-3E3AEDA82DE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A9E3828-9CA2-415B-8E39-3E3AEDA82DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A9E3828-9CA2-415B-8E39-3E3AEDA82DE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F5197915-F6A1-4C15-98D4-AB855BD1799A} = {43A57284-99A3-4973-A7A1-03C3896F8F78}
 		{4A9E3828-9CA2-415B-8E39-3E3AEDA82DE8} = {AD869F2E-820B-4F0C-8FC0-64359C265BF5}
+		{8F03EAFF-4E9C-41A0-8913-4DB04F90A251} = {AD869F2E-820B-4F0C-8FC0-64359C265BF5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8196C8E9-F59B-4A91-AD59-00F3DE2756A0}

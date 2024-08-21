@@ -1,11 +1,16 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Frenet.ShipManagement.DTOs;
 using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services;
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.ViewModels;
+using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit;
 
 namespace Frenet.ShipManagement.UnitTests.Services
 {
@@ -14,12 +19,17 @@ namespace Frenet.ShipManagement.UnitTests.Services
         private readonly Mock<IPedidoRepository> _pedidoRepositoryMock;
         private readonly Mock<IShippingService> _shippingServiceMock;
         private readonly PedidoService _pedidoService;
+        private readonly ILogger<PedidoService> _logger;
 
         public PedidoServiceTests()
         {
             _pedidoRepositoryMock = new Mock<IPedidoRepository>();
             _shippingServiceMock = new Mock<IShippingService>();
-            _pedidoService = new PedidoService(_pedidoRepositoryMock.Object, _shippingServiceMock.Object);
+
+            // Criação do mock do logger
+            _logger = new LoggerFactory().CreateLogger<PedidoService>();
+
+            _pedidoService = new PedidoService(_pedidoRepositoryMock.Object, _shippingServiceMock.Object, _logger);
         }
 
         [Fact]

@@ -3,6 +3,10 @@ using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.ViewModels;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Frenet.ShipManagement.Services
 {
@@ -11,18 +15,21 @@ namespace Frenet.ShipManagement.Services
     /// </summary>
     public class PedidoService : IPedidoService
     {
-        private readonly IPedidoRepository pedidoRepository;
+        private readonly IPedidoRepository _pedidoRepository;
         private readonly IShippingService _shippingService;
+        private readonly ILogger<PedidoService> _logger;
 
         /// <summary>
         /// Inicializa uma nova instância do serviço de pedidos.
         /// </summary>
         /// <param name="repository">Repositório de pedidos utilizado pelo serviço.</param>
         /// <param name="shippingService">Serviço de cálculo de frete utilizado pelo serviço.</param>
-        public PedidoService(IPedidoRepository repository, IShippingService shippingService)
+        /// <param name="logger">Logger para registrar eventos e erros.</param>
+        public PedidoService(IPedidoRepository repository, IShippingService shippingService, ILogger<PedidoService> logger)
         {
-            this.pedidoRepository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _pedidoRepository = repository ?? throw new ArgumentNullException(nameof(repository));
             _shippingService = shippingService ?? throw new ArgumentNullException(nameof(shippingService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -31,7 +38,10 @@ namespace Frenet.ShipManagement.Services
         /// <returns>Uma lista de objetos <see cref="PedidoResponse"/> representando os pedidos mais recentes.</returns>
         public async Task<List<PedidoResponse>> GetPedidos()
         {
-            return await pedidoRepository.GetPedidos();
+            _logger.LogInformation("Obtendo lista dos 10 pedidos mais recentes.");
+            var pedidos = await _pedidoRepository.GetPedidos();
+            _logger.LogInformation("Lista de pedidos obtida com sucesso. Total de pedidos: {Count}", pedidos.Count);
+            return pedidos;
         }
 
         /// <summary>
@@ -41,6 +51,8 @@ namespace Frenet.ShipManagement.Services
         /// <returns>O objeto <see cref="Pedido"/> criado.</returns>
         public async Task<Pedido> CreatePedido(PedidoRequest pedido)
         {
+            _logger.LogInformation("Criando novo pedido. ClienteId: {ClienteId}, Origem: {Origem}, Destino: {Destino}", pedido.ClienteId, pedido.Origem, pedido.Destino);
+
             var simulacao = new SimulacaoDto
             {
                 Destino = pedido.Destino,
@@ -49,16 +61,26 @@ namespace Frenet.ShipManagement.Services
 
             var frete = await _shippingService.CalcularFrete(simulacao);
 
-            var criarPedido = new Pedido
+            if (frete.IsSuccess)
             {
-                ClienteId = pedido.ClienteId,
-                Destino = pedido.Destino,
-                Status = Status.Processamento,
-                Origem = pedido.Origem,
-                ValorFrete = frete.Value.ShippingPrice // Corrigido para acessar o valor corretamente
-            };
+                var criarPedido = new Pedido
+                {
+                    ClienteId = pedido.ClienteId,
+                    Destino = pedido.Destino,
+                    Status = Status.Processamento,
+                    Origem = pedido.Origem,
+                    ValorFrete = frete.Value.ShippingPrice
+                };
 
-            return await pedidoRepository.CreatePedido(criarPedido);
+                var pedidoCriado = await _pedidoRepository.CreatePedido(criarPedido);
+                _logger.LogInformation("Pedido criado com sucesso. PedidoId: {PedidoId}", pedidoCriado.Id);
+                return pedidoCriado;
+            }
+            else
+            {
+                _logger.LogWarning("Falha ao calcular frete para o pedido. Mensagem: {Message}", frete.ErrorMessage);
+                throw new Exception($"Falha ao calcular frete: {frete.ErrorMessage}");
+            }
         }
 
         /// <summary>
@@ -68,7 +90,17 @@ namespace Frenet.ShipManagement.Services
         /// <returns>O objeto <see cref="Pedido"/> correspondente ao identificador fornecido.</returns>
         public async Task<Pedido> GetPedidoById(int id)
         {
-            return await pedidoRepository.GetPedidoById(id);
+            _logger.LogInformation("Obtendo pedido pelo identificador: {Id}", id);
+            var pedido = await _pedidoRepository.GetPedidoById(id);
+            if (pedido != null)
+            {
+                _logger.LogInformation("Pedido encontrado. PedidoId: {PedidoId}", pedido.Id);
+            }
+            else
+            {
+                _logger.LogWarning("Pedido não encontrado. PedidoId: {PedidoId}", id);
+            }
+            return pedido;
         }
 
         /// <summary>
@@ -78,7 +110,10 @@ namespace Frenet.ShipManagement.Services
         /// <returns>Uma lista de objetos <see cref="Pedido"/> associados ao cliente especificado.</returns>
         public async Task<List<PedidoResponse>> GetPedidosByClienteId(int clienteId)
         {
-            return await pedidoRepository.GetPedidosByClienteId(clienteId);
+            _logger.LogInformation("Obtendo pedidos para o clienteId: {ClienteId}", clienteId);
+            var pedidos = await _pedidoRepository.GetPedidosByClienteId(clienteId);
+            _logger.LogInformation("Pedidos obtidos para o clienteId: {ClienteId}. Total de pedidos: {Count}", clienteId, pedidos.Count);
+            return pedidos;
         }
 
         /// <summary>
@@ -89,6 +124,8 @@ namespace Frenet.ShipManagement.Services
         /// <returns>O objeto <see cref="Pedido"/> atualizado.</returns>
         public async Task<Pedido> UpdatePedido(int id, PedidoRequest pedido)
         {
+            _logger.LogInformation("Atualizando pedido. PedidoId: {PedidoId}", id);
+
             var simulacao = new SimulacaoDto
             {
                 Destino = pedido.Destino,
@@ -97,11 +134,32 @@ namespace Frenet.ShipManagement.Services
 
             var frete = await _shippingService.CalcularFrete(simulacao);
 
-            return await pedidoRepository.UpdatePedido(id, pedido, frete.Value.ShippingPrice);
+            if (frete.IsSuccess)
+            {
+                var pedidoAtualizado = await _pedidoRepository.UpdatePedido(id, pedido, frete.Value.ShippingPrice);
+                _logger.LogInformation("Pedido atualizado com sucesso. PedidoId: {PedidoId}", id);
+                return pedidoAtualizado;
+            }
+            else
+            {
+                _logger.LogWarning("Falha ao calcular frete para a atualização do pedido. Mensagem: {Message}", frete.ErrorMessage);
+                throw new Exception($"Falha ao calcular frete: {frete.ErrorMessage}");
+            }
         }
+
         public async Task<Pedido> UpdateStatus(int id, Status status)
         {
-            return await pedidoRepository.UpdateStatus(id, status);
+            _logger.LogInformation("Atualizando status do pedido. PedidoId: {PedidoId}, NovoStatus: {Status}", id, status);
+            var pedidoAtualizado = await _pedidoRepository.UpdateStatus(id, status);
+            _logger.LogInformation("Status do pedido atualizado com sucesso. PedidoId: {PedidoId}", id);
+            return pedidoAtualizado;
+        }
+
+        public async Task Remove(Pedido pedido)
+        {
+            _logger.LogInformation("Removendo pedido. PedidoId: {PedidoId}", pedido.Id);
+            await _pedidoRepository.Remove(pedido);
+            _logger.LogInformation("Pedido removido com sucesso. PedidoId: {PedidoId}", pedido.Id);
         }
     }
 }

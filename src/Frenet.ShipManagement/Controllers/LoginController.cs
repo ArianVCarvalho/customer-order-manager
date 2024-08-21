@@ -1,83 +1,46 @@
-﻿using Frenet.ShipManagement.Data;
-using Frenet.ShipManagement.DTOs;
-using Frenet.ShipManagement.Models;
+﻿using Frenet.ShipManagement.DTOs;
 using Frenet.ShipManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using NLog;
+using System.Threading.Tasks;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LoginController : ControllerBase
+namespace Frenet.ShipManagement.Controllers
 {
-    public const string UserName = "userName";
-    public const string UserId = "userId";
-    public const string Permissions = "permissions";
-    public const string UserOperators = "userOperators";
-
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly ApplicationDbContext _context;
-    private readonly AuthenticationConfiguration _authConfiguration;
-
-    public LoginController(SignInManager<IdentityUser> signInManager, ApplicationDbContext context, IOptions<AuthenticationConfiguration> authConfiguration)
+    /// <summary>
+    /// Controlador responsável pela autenticação de usuários.
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LoginController : ControllerBase
     {
-        _signInManager = signInManager;
-        _context = context;
-        _authConfiguration = authConfiguration.Value;
-    }
+        private readonly IAuthService _authService;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    [HttpPost]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Authenticate([FromBody] UserLoginRequest request)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == request.Email);
-
-        var result = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
-
-        if (!result.Succeeded)
+        /// <summary>
+        /// Inicializa uma nova instância de LoginController.
+        /// </summary>
+        /// <param name="authService">Serviço de autenticação que encapsula a lógica de login.</param>
+        public LoginController(IAuthService authService)
         {
-            return Unauthorized();
+            _authService = authService;
         }
 
-        var now = DateTime.UtcNow;
-
-        var claims = new List<Claim>
+        /// <summary>
+        /// Autentica um usuário e retorna um token JWT se as credenciais forem válidas.
+        /// </summary>
+        /// <param name="request">Dados de login do usuário.</param>
+        /// <returns>Um token JWT para o usuário autenticado.</returns>
+        /// <response code="200">Retorna um token JWT se as credenciais forem válidas.</response>
+        /// <response code="401">Credenciais inválidas.</response>
+        [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public Task<IActionResult> Authenticate([FromBody] UserLoginRequest request)
         {
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(LoginController.UserName, user.UserName),
-            new Claim(LoginController.UserId, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-        };
-
-        var symmetricKeyAsBase64 = _authConfiguration.Secret;
-        var keyByteArray = Encoding.UTF8.GetBytes(symmetricKeyAsBase64);
-        var signingKey = new SymmetricSecurityKey(keyByteArray);
-        var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-
-        var jwtSecurityToken = new JwtSecurityToken(
-            issuer: _authConfiguration.Issuer,
-            audience: _authConfiguration.Audience,
-            claims: claims,
-            notBefore: now,
-            expires: now.Add(TimeSpan.FromMinutes(_authConfiguration.ExpiresInMinutes)),
-            signingCredentials: signingCredentials);
-
-        var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-
-        return Ok(new
-        {
-            JwtResponse = encodedJwt,
-            Expires = jwtSecurityToken.ValidTo,
-        });
-
+            Logger.Info("Autenticando usuário com o email de usuário: {UserName}", request.Email);
+            return _authService.AuthenticateAsync(request);
+        }
     }
 }

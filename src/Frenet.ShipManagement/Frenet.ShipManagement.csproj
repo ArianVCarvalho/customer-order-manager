@@ -11,6 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="NLog.config" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" NoWarn="NU1605" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.1" NoWarn="NU1605" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.8" />
@@ -24,6 +28,9 @@
 		<PackageReference Include="Microsoft.Identity.Web" Version="2.15.2" />
 		<PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="2.15.2" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
+		<PackageReference Include="NLog" Version="5.3.3" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.12" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.12" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
@@ -37,5 +44,12 @@
 	<ItemGroup>
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="nlog.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 
 </Project>

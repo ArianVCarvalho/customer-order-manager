@@ -1,29 +1,44 @@
 using Frenet.ShipManagement.Data;
 using Frenet.ShipManagement.Models;
-using Frenet.ShipManagement.Repositories;
 using Frenet.ShipManagement.Repositories.Interface;
-using Frenet.ShipManagement.Services;
+using Frenet.ShipManagement.Repositories;
 using Frenet.ShipManagement.Services.Interface;
+using Frenet.ShipManagement.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Configuration;
+using NLog.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
+using NLog;
+using LogLevel = NLog.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var config = new NLog.Config.LoggingConfiguration();
+
+// Targets where to log to: File and Console
+var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "file.txt" };
+var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+
+// Rules for mapping loggers to targets            
+config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);
+config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+
+// Apply config           
+NLog.LogManager.Configuration = config;
+
 // Configura o contexto do banco de dados
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
-                .UseSqlServer(builder.Configuration.GetConnectionString("FrenetShipManagementContext") ?? throw new InvalidOperationException("Connection string 'FrenetShipManagementContext' not found.")));
+    .UseSqlServer(builder.Configuration.GetConnectionString("FrenetShipManagementContext") ?? throw new InvalidOperationException("Connection string 'FrenetShipManagementContext' not found.")));
 
+// Configura identidade e autenticação
 builder.Services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -64,19 +79,16 @@ builder.Services.AddAuthentication(options =>
     o.TokenValidationParameters = tokenValidationParameters;
 });
 
-
 // Registra serviços e repositórios
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
-
 builder.Services.AddHostedService<UserIdentitySeedService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<AuthenticationConfiguration>(builder.Configuration.GetSection("Authentication"));
-
-// Registra o HttpClient para o ShippingService
 builder.Services.AddHttpClient<IShippingService, ShippingService>();
 
 // Configuração para usar camelCase e ignorar valores nulos no JSON
@@ -95,26 +107,27 @@ builder.Services.AddSwaggerGen(c =>
         Title = "Sistema de Gerenciamento de Pedidos para Logística",
         Version = "v1",
         Description = "Desenvolver uma aplicação de gerenciamento de pedidos que permita a criação, " +
-        "atualização, visualização e exclusão de pedidos de transporte. O sistema deve incluir funcionalidades para gerenciar informações de clientes, " +
-        "status de pedidos e integração com um serviço de terceiros para cálculo de frete."
+                      "atualização, visualização e exclusão de pedidos de transporte. O sistema deve incluir funcionalidades para gerenciar informações de clientes, " +
+                      "status de pedidos e integração com um serviço de terceiros para cálculo de frete."
     });
 
-    // Personalize a aparência dos parâmetros
     c.DescribeAllParametersInCamelCase();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Insira o JWT Bearer token no campo abaixo usando o formato **Bearer {token}**",
+        Description = "Insira o JWT Bearer token no campo abaixo usando o formato **{token}**",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Scheme = "bearer"
     });
 
-    // Adiciona o requisito de segurança globalmente
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            new OpenApiSecurityScheme{
-                Reference = new OpenApiReference{
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
                     Id = "Bearer",
                     Type = ReferenceType.SecurityScheme
                 }
@@ -122,28 +135,22 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
         }
     });
-
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
-
-
 var app = builder.Build();
 
 // Configure o pipeline de requisição HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sistema de Gerenciamento de Pedidos para Logística v1");
+    });
 }
 
 app.UseHttpsRedirection();
-
-// Ativa autenticação e autorização
-app.UseAuthentication();  // Certifique-se de que este middleware seja usado
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

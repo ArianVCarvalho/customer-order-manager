@@ -1,10 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Frenet.ShipManagement.DTOs;
 using Frenet.ShipManagement.Models;
 using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit;
 
 namespace Frenet.ShipManagement.UnitTests.Services
 {
@@ -12,21 +17,26 @@ namespace Frenet.ShipManagement.UnitTests.Services
     {
         private readonly Mock<IClienteRepository> _clienteRepositoryMock;
         private readonly ClienteService _clienteService;
+        private readonly ILogger<ClienteService> _logger;
 
         public ClienteServiceTests()
         {
             _clienteRepositoryMock = new Mock<IClienteRepository>();
-            _clienteService = new ClienteService(_clienteRepositoryMock.Object);
+
+            // Criação do mock do logger
+            _logger = new LoggerFactory().CreateLogger<ClienteService>();
+
+            _clienteService = new ClienteService(_clienteRepositoryMock.Object, _logger);
         }
 
         [Fact]
         public async Task GetClientesAsync_ShouldReturnListOfClientes()
         {
             var expectedClientes = new List<Cliente>
-        {
-            new Cliente { Id = 1, Nome = "Cliente 1" },
-            new Cliente { Id = 2, Nome = "Cliente 2" }
-        };
+            {
+                new Cliente { Id = 1, Nome = "Cliente 1" },
+                new Cliente { Id = 2, Nome = "Cliente 2" }
+            };
 
             _clienteRepositoryMock.Setup(repo => repo.GetClientesAsync())
                 .ReturnsAsync(expectedClientes);
@@ -80,7 +90,6 @@ namespace Frenet.ShipManagement.UnitTests.Services
 
             var result = await _clienteService.CreateCliente(clienteDto);
 
-
             result.Should().BeEquivalentTo(expectedCliente);
             _clienteRepositoryMock.Verify(repo => repo.CreateCliente(clienteDto), Times.Once);
         }
@@ -113,5 +122,4 @@ namespace Frenet.ShipManagement.UnitTests.Services
             _clienteRepositoryMock.Verify(repo => repo.DeleteCliente(clienteId), Times.Once);
         }
     }
-
 }

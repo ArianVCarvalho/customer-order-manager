@@ -2,6 +2,8 @@
 using Frenet.ShipManagement.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
+using ILogger = NLog.ILogger; // Usando o ILogger do NLog
 
 namespace Frenet.ShipManagement.Controllers
 {
@@ -14,6 +16,7 @@ namespace Frenet.ShipManagement.Controllers
     public class ShippingController : ControllerBase
     {
         private readonly IShippingService _shippingService;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Inicializa uma nova instância de <see cref="ShippingController"/>.
@@ -23,7 +26,7 @@ namespace Frenet.ShipManagement.Controllers
         {
             _shippingService = shippingService;
         }
-
+      
         /// <summary>
         /// Calcula o frete com base nos CEPs de origem e destino.
         /// </summary>
@@ -35,21 +38,26 @@ namespace Frenet.ShipManagement.Controllers
         [HttpPost("calcular")]
         public async Task<IActionResult> CalcularFrete([FromBody] SimulacaoDto cotacao)
         {
+            Logger.Info("Iniciando o cálculo de frete para os CEPs: {Origem} - {Destino}", cotacao.Origem, cotacao.Destino);
+
             try
             {
                 var resultado = await _shippingService.CalcularFrete(cotacao);
 
                 if (resultado.IsSuccess)
                 {
+                    Logger.Info("Cálculo de frete bem-sucedido: {Frete}", resultado.Value);
                     return Ok(resultado.Value);
                 }
                 else
                 {
+                    Logger.Error("Falha no cálculo de frete: {Error}", resultado.ErrorMessage);
                     return StatusCode(resultado.StatusCode, resultado.ErrorMessage);
                 }
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "Erro ao processar a solicitação de cálculo de frete.");
                 return StatusCode(500, $"Erro ao processar a solicitação: {ex.Message}");
             }
         }

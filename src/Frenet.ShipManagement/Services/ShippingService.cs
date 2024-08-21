@@ -2,6 +2,11 @@
 using Frenet.ShipManagement.Services.Interface;
 using Frenet.ShipManagement.Validators;
 using Frenet.ShipManagement.ViewModels;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using static Frenet.ShipManagement.Models.ShippingResponseFrenet;
 
 namespace Frenet.ShipManagement.Services
@@ -11,32 +16,35 @@ namespace Frenet.ShipManagement.Services
         private readonly HttpClient _httpClient;
         private readonly string _apiBaseUrl;
         private readonly string _accessToken;
+        private readonly ILogger<ShippingService> _logger;
 
-        public ShippingService(HttpClient httpClient, IConfiguration configuration)
+        public ShippingService(HttpClient httpClient, IConfiguration configuration, ILogger<ShippingService> logger)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"] ?? throw new ArgumentNullException("FreteApiBaseUrl não configurada.");
             _accessToken = configuration["FreteApiConfig:AccessToken"] ?? throw new ArgumentNullException("AccessToken não configurado.");
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<Result<ShippingResponse>> CalcularFrete(SimulacaoDto cotacao)
         {
             if (cotacao == null)
             {
+                _logger.LogWarning("Dados de cotação não podem ser nulos.");
                 return Result<ShippingResponse>.Failure(400, "Dados de cotação não podem ser nulos.");
             }
 
             if (!CepValidator.IsValid(cotacao.Origem) || !CepValidator.IsValid(cotacao.Destino))
             {
+                _logger.LogWarning("Os CEPs fornecidos são inválidos: Origem: {Origem}, Destino: {Destino}", cotacao.Origem, cotacao.Destino);
                 return Result<ShippingResponse>.Failure(400, "Os CEPs fornecidos são inválidos.");
             }
 
             try
             {
-                // Define o endpoint completo da API de frete
                 string apiUrl = $"{_apiBaseUrl}/shipping/quote";
+                _logger.LogInformation("Enviando requisição para a API de frete: {ApiUrl}", apiUrl);
 
-                // Cria o objeto que será enviado no corpo da requisição
                 var requestData = new
                 {
                     SellerCEP = cotacao.Origem,
@@ -79,9 +87,9 @@ namespace Frenet.ShipManagement.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
+                    _logger.LogInformation("Resposta recebida com sucesso da API de frete.");
 
+                    string responseBody = await response.Content.ReadAsStringAsync();
                     var responseObject = await response.Content.ReadFromJsonAsync<ShippingResponseWrapper>();
 
                     var firstService = responseObject?.ShippingSevicesArray?[0];
@@ -97,18 +105,22 @@ namespace Frenet.ShipManagement.Services
                             OriginalDeliveryTime = deliveryTime
                         };
 
+                        _logger.LogInformation("Frete calculado com sucesso: Preço: {ShippingPrice}, Tempo de Entrega: {DeliveryTime}", shippingPrice, deliveryTime);
                         return Result<ShippingResponse>.Success(result);
                     }
 
+                    _logger.LogWarning("Nenhum serviço de frete encontrado na resposta.");
                     return Result<ShippingResponse>.Failure(500, "Nenhum serviço de frete encontrado.");
                 }
                 else
                 {
+                    _logger.LogWarning("Falha ao consultar a API de frete. Código de status: {StatusCode}", response.StatusCode);
                     return Result<ShippingResponse>.Failure((int)response.StatusCode, "Falha ao consultar a API de frete.");
                 }
             }
             catch (HttpRequestException ex)
             {
+                _logger.LogError(ex, "Erro ao consultar frete: {Message}", ex.Message);
                 return Result<ShippingResponse>.Failure(500, $"Erro ao consultar frete: {ex.Message}");
             }
         }

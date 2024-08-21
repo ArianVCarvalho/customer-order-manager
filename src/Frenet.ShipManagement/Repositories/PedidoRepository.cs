@@ -139,5 +139,17 @@ namespace Frenet.ShipManagement.Repositories
 
             return pedidoExistente;
         }
+        public async Task Remove(Pedido pedido)
+        {
+            _context.Pedido.Remove(pedido);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new DbUpdateConcurrencyException("Falha na exclusão devido a uma modificação concorrente. Tente novamente.", ex);
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using Frenet.ShipManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Frenet.ShipManagement.Controllers
 {
@@ -20,6 +21,7 @@ namespace Frenet.ShipManagement.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IPedidoService _pedidoService;
         private readonly IClienteService _clienteService;
+        private readonly ILogger<PedidoController> _logger;
 
         /// <summary>
         /// Inicializa uma nova instância de PedidoController.
@@ -27,15 +29,18 @@ namespace Frenet.ShipManagement.Controllers
         /// <param name="context">Contexto do banco de dados para operações relacionadas aos pedidos.</param>
         /// <param name="pedidoService">Serviço de pedidos que encapsula a lógica de negócio.</param>
         /// <param name="clienteService">Serviço de clientes que encapsula a lógica de negócio relacionada aos clientes.</param>
+        /// <param name="logger">Logger para registro de eventos e erros.</param>
         public PedidoController(
             ApplicationDbContext context,
             IPedidoService pedidoService,
-            IClienteService clienteService
+            IClienteService clienteService,
+            ILogger<PedidoController> logger
         )
         {
             _context = context;
             _pedidoService = pedidoService;
             _clienteService = clienteService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -53,11 +58,14 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Iniciando a obtenção dos 10 pedidos mais recentes.");
                 var pedidos = await _pedidoService.GetPedidos();
+                _logger.LogInformation("Pedidos obtidos com sucesso.");
                 return Ok(pedidos);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao obter pedidos.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter pedidos.");
             }
         }
@@ -80,17 +88,21 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Obtendo detalhes do pedido com ID: {Id}", id);
                 var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)
                 {
+                    _logger.LogWarning("Pedido com ID: {Id} não encontrado.", id);
                     return NotFound("Pedido não encontrado.");
                 }
 
+                _logger.LogInformation("Detalhes do pedido com ID: {Id} obtidos com sucesso.", id);
                 return Ok(pedido);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao obter detalhes do pedido com ID: {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter detalhes do pedido.");
             }
         }
@@ -113,24 +125,29 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Obtendo pedidos para o cliente com ID: {Id}", id);
                 var cliente = await _clienteService.GetClienteById(id);
 
                 if (cliente == null)
                 {
+                    _logger.LogWarning("Cliente com ID: {Id} não encontrado.", id);
                     return NotFound("ID do cliente não foi encontrado.");
                 }
 
-                var pedido = await _pedidoService.GetPedidosByClienteId(id);
+                var pedidos = await _pedidoService.GetPedidosByClienteId(id);
 
-                if (pedido == null || pedido.Count == 0)
+                if (pedidos == null || pedidos.Count == 0)
                 {
+                    _logger.LogWarning("Nenhum pedido encontrado para o cliente com ID: {Id}", id);
                     return NotFound("Nenhum pedido encontrado para o cliente com o ID fornecido.");
                 }
 
-                return Ok(pedido);
+                _logger.LogInformation("Pedidos para o cliente com ID: {Id} obtidos com sucesso.", id);
+                return Ok(pedidos);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao obter pedidos para o cliente com ID: {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter pedidos do cliente.");
             }
         }
@@ -155,23 +172,28 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Criando um novo pedido para o cliente com ID: {ClienteId}", pedido.ClienteId);
                 var cliente = await _clienteService.GetClienteById(pedido.ClienteId);
 
                 if (cliente == null)
                 {
+                    _logger.LogWarning("Cliente com ID: {ClienteId} não encontrado.", pedido.ClienteId);
                     return NotFound("Cliente não encontrado.");
                 }
 
                 if (ModelState.IsValid)
                 {
                     await _pedidoService.CreatePedido(pedido);
+                    _logger.LogInformation("Pedido criado com sucesso para o cliente com ID: {ClienteId}", pedido.ClienteId);
                     return Ok(pedido);
                 }
 
+                _logger.LogWarning("Dados inválidos para criação do pedido.");
                 return BadRequest(ModelState);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao criar pedido.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao criar pedido.");
             }
         }
@@ -199,27 +221,33 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Atualizando o pedido com ID: {Id}", id);
                 var isPedido = await _pedidoService.GetPedidoById(id);
 
                 if (isPedido == null)
                 {
+                    _logger.LogWarning("Pedido com ID: {Id} não encontrado.", id);
                     return NotFound("Pedido não existe.");
                 }
 
                 if (ModelState.IsValid)
                 {
                     await _pedidoService.UpdatePedido(id, pedido);
+                    _logger.LogInformation("Pedido com ID: {Id} atualizado com sucesso.", id);
                     return Ok(pedido);
                 }
 
+                _logger.LogWarning("Dados inválidos para atualização do pedido com ID: {Id}", id);
                 return BadRequest(ModelState);
             }
             catch (DbUpdateConcurrencyException)
             {
+                _logger.LogError("Houve um problema com a atualização do pedido com ID: {Id}. O pedido pode ter sido modificado por outro usuário.", id);
                 return Conflict("Houve um problema com a atualização. O pedido pode ter sido modificado por outro usuário.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao atualizar o pedido com ID: {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
             }
         }
@@ -245,20 +273,24 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
+                _logger.LogInformation("Atualizando o status do pedido com ID: {Id} para {Status}", id, status);
                 var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)
                 {
+                    _logger.LogWarning("Pedido com ID: {Id} não encontrado.", id);
                     return NotFound("Pedido não encontrado.");
                 }
 
                 pedido.Status = status;
                 await _pedidoService.UpdateStatus(id, status);
 
+                _logger.LogInformation("Status do pedido com ID: {Id} atualizado para {Status}.", id, status);
                 return Ok($"Status do pedido {pedido.Id} atualizado para {pedido.Status}.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao atualizar status do pedido com ID: {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar status do pedido.");
             }
         }
@@ -281,19 +313,23 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                var pedido = await _context.Pedido.FindAsync(id);
+                _logger.LogInformation("Excluindo o pedido com ID: {Id}", id);
+                var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)
                 {
+                    _logger.LogWarning("Pedido com ID: {Id} não encontrado.", id);
                     return NotFound("Pedido não encontrado.");
                 }
 
-                _context.Pedido.Remove(pedido);
-                await _context.SaveChangesAsync();
+                await _pedidoService.Remove(pedido);
+
+                _logger.LogInformation("Pedido com ID: {Id} deletado com sucesso.", id);
                 return Ok($"Pedido {pedido.Id} deletado com sucesso");
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Erro ao excluir pedido com ID: {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao excluir pedido.");
             }
         }
