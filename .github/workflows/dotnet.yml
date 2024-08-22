@@ -33,8 +33,8 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     env:
-      FRETE_API_BASE_URL: ${{ secrets.FRETE_API_BASE_URL }}
-      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      FRETE_API_BASE_URL: "http://api.frenet.com.br"
+      ACCESS_TOKEN: "FEB32938R22E9R4749R8631R28A4CBC5B366"
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
