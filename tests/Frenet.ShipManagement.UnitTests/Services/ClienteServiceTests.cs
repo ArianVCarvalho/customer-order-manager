@@ -75,7 +75,7 @@ namespace Frenet.ShipManagement.UnitTests.Services
 
             var notFoundResult = result as NotFound<string>;
             notFoundResult.Should().NotBeNull();
-            notFoundResult.Value.Should().Be("Cliente não encontrado");
+            notFoundResult.Value.Should().Be("Cliente nao encontrado");
             _clienteRepositoryMock.Verify(repo => repo.GetClienteById(clienteId), Times.Once);
         }
 
