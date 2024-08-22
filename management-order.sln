@@ -19,6 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frenet.ShipManagement.IntegrationTests", "tests\Frenet.ShipManagement.IntegrationTests\Frenet.ShipManagement.IntegrationTests.csproj", "{8F03EAFF-4E9C-41A0-8913-4DB04F90A251}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{9FA0A869-B343-4099-8DA9-E747ECCCC6C2}"
+	ProjectSection(SolutionItems) = preProject
+		script.sql = script.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

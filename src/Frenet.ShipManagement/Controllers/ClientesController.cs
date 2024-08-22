@@ -115,8 +115,6 @@ namespace Frenet.ShipManagement.Controllers
                 return BadRequest(ModelState);
             }
 
-            Logger.Info("Iniciando a criação do cliente.");
-
             try
             {
                 await _clienteService.CreateCliente(clienteDto);
@@ -150,8 +148,6 @@ namespace Frenet.ShipManagement.Controllers
                 return BadRequest(ModelState);
             }
 
-            Logger.Info("Iniciando a atualização do cliente com ID: {ID}", id);
-
             try
             {
                 var clienteUpdate = await _clienteService.UpdateCliente(cliente, id);
@@ -161,7 +157,6 @@ namespace Frenet.ShipManagement.Controllers
                     return NotFound($"Cliente com ID {id} não encontrado.");
                 }
 
-                Logger.Info("Cliente com ID {ID} atualizado com sucesso.", id);
                 return Ok($"Cliente atualizado: {clienteUpdate.Id}");
             }
             catch (DbUpdateConcurrencyException ex)
@@ -190,8 +185,6 @@ namespace Frenet.ShipManagement.Controllers
                 return BadRequest("ID inválido.");
             }
 
-            Logger.Info("Iniciando a exclusão do cliente com ID: {ID}", id);
-
             try
             {
                 var cliente = await _context.Cliente.FindAsync(id);
@@ -202,7 +195,6 @@ namespace Frenet.ShipManagement.Controllers
                 }
 
                 await _clienteService.DeleteCliente(id);
-                Logger.Info("Cliente com ID {ID} excluído com sucesso.", id);
                 return Ok($"Cliente {id} deletado");
             }
             catch (Exception ex)

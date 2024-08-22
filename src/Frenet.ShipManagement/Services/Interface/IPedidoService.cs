@@ -5,7 +5,7 @@ namespace Frenet.ShipManagement.Services.Interface
 {
     public interface IPedidoService
     {
-        Task<List<PedidoResponse>> GetPedidos();
+        Task<List<PedidoResponse>> GetPedidos(CancellationToken cancellation);
         Task<Pedido> CreatePedido(PedidoRequest pedido);
         Task<Pedido> GetPedidoById(int id);
         Task<List<PedidoResponse>> GetPedidosByClienteId(int clienteId);

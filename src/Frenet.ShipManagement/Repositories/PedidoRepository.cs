@@ -24,7 +24,7 @@ namespace Frenet.ShipManagement.Repositories
         /// Obtém a lista dos últimos 10 pedidos ordenados pela data de criação.
         /// </summary>
         /// <returns>Lista de objetos PedidoResponse</returns>
-        public async Task<List<PedidoResponse>> GetPedidos()
+        public async Task<List<PedidoResponse>> GetPedidos(CancellationToken cancellation)
         {
             var pedidos = await _context.Pedido
                 .OrderByDescending(p => p.DataCriacao)

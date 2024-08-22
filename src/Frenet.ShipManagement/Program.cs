@@ -86,7 +86,6 @@ builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddHostedService<UserIdentitySeedService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<AuthenticationConfiguration>(builder.Configuration.GetSection("Authentication"));
 builder.Services.AddHttpClient<IShippingService, ShippingService>();

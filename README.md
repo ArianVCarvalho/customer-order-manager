@@ -12,20 +12,29 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
 - **NLog** configurado para logging.
 
 ## Configuração do Ambiente
+1. Crie um banco de dados SQL SERVER e rode o scrip que consta na pasta SQL
 
-1. **Crie o arquivo `appsettings.json`** na raiz do projeto com o seguinte conteúdo:
+2. **Crie/altere o arquivo `appsettings.json`** na raiz do projeto com o seguinte conteúdo:
 
     ```json
     {
       "ConnectionStrings": {
         "FrenetShipManagementContext": "Server=seu_servidor;Database=seu_banco_de_dados;User Id=seu_usuario;Password=sua_senha;"
-      },
-      "Authentication": {
-        "Secret": "sua_chave_secreta_base64",
-        "Issuer": "seu_emissor",
-        "Audience": "seu_publico"
       }
     }
+    ```
+3. **Adicione em suas `secrets.json` no visual studio ou em `.NET User Secrets` se for rodar a aplicação no rider** os seguintes dados
+    ```json
+        "FreteApiConfig": {
+        "FreteApiBaseUrl": "http://api.frenet.com.br",
+        "AccessToken": "FEB32938R22E9R4749R8631R28A4CBC5B366" //ou utilize seu proprio access token
+      },
+      "Authentication": {
+        "Secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMjAyNC0wOC0xOCIsImRlc2NyaWNhbyI6InRlc3RlIHByYXRpY28ifQ.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "Issuer": "http://frenet.com.br",
+        "Audience": "Frenet.ShipManagementClient",
+        "ExpiresInMinutes": 60
+      }
     ```
 
     Substitua os valores pelos detalhes do seu banco de dados e as configurações do JWT.
@@ -33,11 +42,6 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
 2. **Configure o NLog**
 
    O NLog está configurado para registrar mensagens no console. Certifique-se de que o arquivo `NLog.config` ou as configurações de log estejam apropriados para o seu ambiente.
-
-## Configuração do Banco de Dados
-
-1. **Crie o banco de dados** SQL Server se ainda não existir.
-2. **Configure a conexão** com o banco de dados no arquivo `appsettings.json`.
 
 ## Inicialização do Projeto
 
@@ -90,7 +94,6 @@ Para obter um JWT e acessar a aplicação, siga estas etapas:
 
 2. **Use o JWT** obtido para acessar as rotas protegidas da API. Adicione o token ao cabeçalho de autorização das suas requisições usando o formato `{token}`.
 
-
 ## Logging e Monitoramento
 
 - **Verifique os logs** gerados no console para assegurar que a aplicação está registrando informações corretamente.
@@ -115,7 +118,8 @@ Este projeto utiliza testes unitários para garantir que as funcionalidades dos s
 
     ```bash
     dotnet restore
-    ```  
+    ```
+  
  2.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
      ```bash
      dotnet build
@@ -150,12 +154,15 @@ Antes de executar os testes de integração, certifique-se de que você tenha o seg
     Testcontainers usa Docker para criar um contêiner SQL Server. Verifique se o Docker está instalado e em execução no seu sistema.
 
 3. Executando
- Compile o projeto   Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
-    ```bash       dotnet build
+ Compile o projeto 
+  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+    ```bash
+       dotnet build
       ```
 4. Execute os testes
     Use o seguinte comando para rodar os testes de integração com xUnit:
-    ```bash       dotnet test
+    ```bash
+       dotnet test
       ```
 
 

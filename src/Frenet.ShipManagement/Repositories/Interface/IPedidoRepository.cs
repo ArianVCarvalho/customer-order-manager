@@ -7,7 +7,7 @@ namespace Frenet.ShipManagement.Repositories.Interface
     {
         Task<Pedido> CreatePedido(Pedido pedido);
         Task<Pedido> GetPedidoById(int id);
-        Task<List<PedidoResponse>> GetPedidos();
+        Task<List<PedidoResponse>> GetPedidos(CancellationToken cancellation);
         Task<List<PedidoResponse>> GetPedidosByClienteId(int clienteId);
         Task Remove(Pedido pedido);
         Task<Pedido> UpdatePedido(int id, PedidoRequest pedido, decimal frete);

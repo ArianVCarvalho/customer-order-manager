@@ -54,13 +54,11 @@ namespace Frenet.ShipManagement.Controllers
         [ProducesResponseType(typeof(IEnumerable<PedidoDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetPedidos()
+        public async Task<IActionResult> GetPedidos(CancellationToken cancellation)
         {
             try
             {
-                _logger.LogInformation("Iniciando a obtenção dos 10 pedidos mais recentes.");
-                var pedidos = await _pedidoService.GetPedidos();
-                _logger.LogInformation("Pedidos obtidos com sucesso.");
+                var pedidos = await _pedidoService.GetPedidos(cancellation);
                 return Ok(pedidos);
             }
             catch (Exception ex)
@@ -88,7 +86,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Obtendo detalhes do pedido com ID: {Id}", id);
                 var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)
@@ -97,7 +94,6 @@ namespace Frenet.ShipManagement.Controllers
                     return NotFound("Pedido não encontrado.");
                 }
 
-                _logger.LogInformation("Detalhes do pedido com ID: {Id} obtidos com sucesso.", id);
                 return Ok(pedido);
             }
             catch (Exception ex)
@@ -125,7 +121,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Obtendo pedidos para o cliente com ID: {Id}", id);
                 var cliente = await _clienteService.GetClienteById(id);
 
                 if (cliente == null)
@@ -172,7 +167,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Criando um novo pedido para o cliente com ID: {ClienteId}", pedido.ClienteId);
                 var cliente = await _clienteService.GetClienteById(pedido.ClienteId);
 
                 if (cliente == null)
@@ -184,7 +178,6 @@ namespace Frenet.ShipManagement.Controllers
                 if (ModelState.IsValid)
                 {
                     await _pedidoService.CreatePedido(pedido);
-                    _logger.LogInformation("Pedido criado com sucesso para o cliente com ID: {ClienteId}", pedido.ClienteId);
                     return Ok(pedido);
                 }
 
@@ -221,7 +214,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Atualizando o pedido com ID: {Id}", id);
                 var isPedido = await _pedidoService.GetPedidoById(id);
 
                 if (isPedido == null)
@@ -273,7 +265,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Atualizando o status do pedido com ID: {Id} para {Status}", id, status);
                 var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)
@@ -285,7 +276,6 @@ namespace Frenet.ShipManagement.Controllers
                 pedido.Status = status;
                 await _pedidoService.UpdateStatus(id, status);
 
-                _logger.LogInformation("Status do pedido com ID: {Id} atualizado para {Status}.", id, status);
                 return Ok($"Status do pedido {pedido.Id} atualizado para {pedido.Status}.");
             }
             catch (Exception ex)
@@ -313,7 +303,6 @@ namespace Frenet.ShipManagement.Controllers
         {
             try
             {
-                _logger.LogInformation("Excluindo o pedido com ID: {Id}", id);
                 var pedido = await _pedidoService.GetPedidoById(id);
 
                 if (pedido == null)

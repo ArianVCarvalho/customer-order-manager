@@ -38,8 +38,6 @@ namespace Frenet.ShipManagement.Controllers
         [HttpPost("calcular")]
         public async Task<IActionResult> CalcularFrete([FromBody] SimulacaoDto cotacao)
         {
-            Logger.Info("Iniciando o cálculo de frete para os CEPs: {Origem} - {Destino}", cotacao.Origem, cotacao.Destino);
-
             try
             {
                 var resultado = await _shippingService.CalcularFrete(cotacao);

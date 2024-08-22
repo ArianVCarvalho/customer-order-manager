@@ -27,20 +27,18 @@ namespace Frenet.ShipManagement.Services
         /// <param name="logger">Logger para registrar eventos e erros.</param>
         public PedidoService(IPedidoRepository repository, IShippingService shippingService, ILogger<PedidoService> logger)
         {
-            _pedidoRepository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _shippingService = shippingService ?? throw new ArgumentNullException(nameof(shippingService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _pedidoRepository = repository;
+            _shippingService = shippingService;
+            _logger = logger;
         }
 
         /// <summary>
         /// Obtém uma lista dos 10 pedidos mais recentes.
         /// </summary>
         /// <returns>Uma lista de objetos <see cref="PedidoResponse"/> representando os pedidos mais recentes.</returns>
-        public async Task<List<PedidoResponse>> GetPedidos()
+        public async Task<List<PedidoResponse>> GetPedidos(CancellationToken cancellation)
         {
-            _logger.LogInformation("Obtendo lista dos 10 pedidos mais recentes.");
-            var pedidos = await _pedidoRepository.GetPedidos();
-            _logger.LogInformation("Lista de pedidos obtida com sucesso. Total de pedidos: {Count}", pedidos.Count);
+            var pedidos = await _pedidoRepository.GetPedidos(cancellation);
             return pedidos;
         }
 

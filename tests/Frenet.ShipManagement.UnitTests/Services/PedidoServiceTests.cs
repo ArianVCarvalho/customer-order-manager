@@ -41,13 +41,13 @@ namespace Frenet.ShipManagement.UnitTests.Services
                 new PedidoResponse { ClienteId = 2, Pedido = new PedidoDto { Id = 2, Destino = "33333333", Origem = "44444444", Status = Status.Processamento } }
             };
 
-            _pedidoRepositoryMock.Setup(repo => repo.GetPedidos())
+            _pedidoRepositoryMock.Setup(repo => repo.GetPedidos(default))
                 .ReturnsAsync(expectedPedidos);
 
-            var result = await _pedidoService.GetPedidos();
+            var result = await _pedidoService.GetPedidos(default);
 
             result.Should().BeEquivalentTo(expectedPedidos);
-            _pedidoRepositoryMock.Verify(repo => repo.GetPedidos(), Times.Once);
+            _pedidoRepositoryMock.Verify(repo => repo.GetPedidos(default), Times.Once);
         }
 
         [Fact]
