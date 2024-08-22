@@ -85,31 +85,16 @@ Para obter o JWT e acessar a aplicação, siga estas etapas:
 ---
 ## Testes Unitários
 
-Este projeto utiliza testes unitários para garantir que as funcionalidades dos serviços. Para configurar e executar os testes, siga as etapas abaixo.
+Este projeto utiliza testes unitários para garantir que as funcionalidades dos serviços estejam funcionando corretamente. Para configurar e executar os testes, siga as etapas abaixo.
 
 ### Configuração dos Testes
 Acesse Acesse `tests/Frenet.ShipManagement.UnitTests`
 
-1. **Certifique-se de que todas as dependências estão instaladas ao acessar o projeto de teste**:
-   O projeto utiliza o framework `xUnit` e a biblioteca `FluentAssertions` para os testes unitários. As dependências podem ser instaladas com os seguintes comandos:
-
-   ```bash
-   dotnet add package xunit
-   dotnet add package FluentAssertions
-   dotnet add package Moq
-   ````
-
-    ou
-
-    ```bash
-    dotnet restore
-    ```
-  
- 2.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+1.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
      ```bash
      dotnet build
      ```
- 3. para rodar os testes execute
+ 2. para rodar os testes execute
     ```bash
      dotnet test
      ```
@@ -133,8 +118,7 @@ Acesse `tests/Frenet.ShipManagement.IntegrationTests`
    ```bash
    dotnet restore
     ```
-2. Configure o Docker
-    Testcontainers usa Docker para criar um contêiner SQL Server. Verifique se o Docker está instalado e em execução no seu sistema.
+2. Mantenha o docker aberto/rodando
 
 3. Executando
  Compile o projeto 
