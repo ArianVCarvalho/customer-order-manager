@@ -51,7 +51,7 @@ namespace Frenet.ShipManagement.Services
             if (cliente == null)
             {
                 _logger.LogWarning("Cliente nao encontrado. ID: {Id}", id);
-                return Results.NotFound<string>("Cliente não encontrado");
+                return Results.NotFound<string>("Cliente nao encontrado");
             }
 
             _logger.LogInformation("Cliente encontrado. ID: {Id}", id);

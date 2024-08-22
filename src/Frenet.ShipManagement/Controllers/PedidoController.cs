@@ -172,7 +172,7 @@ namespace Frenet.ShipManagement.Controllers
                 if (cliente == null)
                 {
                     _logger.LogWarning("Cliente com ID: {ClienteId} não encontrado.", pedido.ClienteId);
-                    return NotFound("Cliente não encontrado.");
+                    return NotFound("Cliente nao encontrado.");
                 }
 
                 if (ModelState.IsValid)

@@ -73,7 +73,7 @@ namespace Frenet.ShipManagement.Repositories
             var updateCliente = await _context.Cliente.FindAsync(id);
 
             if (updateCliente == null)
-                throw new KeyNotFoundException("Cliente não encontrado");
+                throw new KeyNotFoundException("Cliente nao encontrado");
 
             updateCliente.Nome = cliente.Nome;
             updateCliente.Telefone = cliente.Telefone;
@@ -92,7 +92,7 @@ namespace Frenet.ShipManagement.Repositories
 
             if (cliente == null)
             {
-                throw new KeyNotFoundException("Cliente não encontrado.");
+                throw new KeyNotFoundException("Cliente nao encontrado.");
             }
 
             _context.Cliente.Remove(cliente);

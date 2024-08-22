@@ -191,7 +191,7 @@ namespace Frenet.ShipManagement.Controllers
                 if (cliente == null)
                 {
                     Logger.Warn("Cliente com ID {ID} não encontrado para exclusão.", id);
-                    return NotFound("Cliente não encontrado.");
+                    return NotFound("Cliente nao encontrado.");
                 }
 
                 await _clienteService.DeleteCliente(id);
