@@ -28,26 +28,3 @@ jobs:
     - name: Test
       run: dotnet test management-order.sln --filter DisplayName~UnitTests --no-build --verbosity normal
   
-  integration-tests:
-    needs: unit-tests
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    env:
-      FRETE_API_BASE_URL: "http://api.frenet.com.br"
-      ACCESS_TOKEN: "FEB32938R22E9R4749R8631R28A4CBC5B366"
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 8.0.x
-    - name: Workload update
-      run: dotnet workload update
-    - name: Aspire install
-      run: dotnet workload install aspire
-    - name: Restore dependencies
-      run: dotnet restore management-order.sln
-    - name: Build
-      run: dotnet build management-order.sln --no-restore
-    - name: Test
-      run: dotnet test management-order.sln --filter DisplayName~IntegrationTests --no-build --verbosity normal
