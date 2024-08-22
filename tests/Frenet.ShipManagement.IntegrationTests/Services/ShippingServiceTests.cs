@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using WireMock.Server;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
 using Xunit;
 using Frenet.ShipManagement.DTOs;
 using Frenet.ShipManagement.Services;
@@ -16,57 +12,45 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
 {
     public class ShippingServiceTests : IDisposable
     {
-        private WireMockServer _wireMockServer;
         private HttpClient _httpClient;
         private ShippingService _shippingService;
-        private string _apiBaseUrl;
         private readonly ILogger<ShippingService> _logger;
 
         public ShippingServiceTests()
         {
-            // Criação do mock do logger
             _logger = new LoggerFactory().CreateLogger<ShippingService>();
 
-            // Inicializa o WireMockServer
-            _wireMockServer = WireMockServer.Start();
-            _apiBaseUrl = $"http://localhost:{_wireMockServer.Ports[0]}";
             _httpClient = new HttpClient();
 
-            // Configura o ShippingService com o endpoint da API mock
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new[]
-                {
-                    new KeyValuePair<string, string>("FreteApiConfig:FreteApiBaseUrl", _apiBaseUrl),
-                    new KeyValuePair<string, string>("FreteApiConfig:AccessToken", "dummy-token")
-                })
+                .AddUserSecrets<ShippingService>() 
                 .Build();
 
+            var apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"]
+                ?? throw new InvalidOperationException("FreteApiBaseUrl não configurada.");
+            var accessToken = configuration["FreteApiConfig:AccessToken"]
+                ?? throw new InvalidOperationException("AccessToken não configurado.");
+
             _shippingService = new ShippingService(_httpClient, configuration, _logger);
-
-            ConfigureWireMockServer();
-        }
-
-        private void ConfigureWireMockServer()
-        {
-            _wireMockServer
-                .Given(Request.Create().WithPath("/shipping/quote").UsingPost())
-                .RespondWith(Response.Create()
-                    .WithStatusCode(200)
-                    .WithBody(@"{
-                        ""ShippingSevicesArray"": [
-                            {
-                                ""ShippingPrice"": ""320.68"",
-                                ""DeliveryTime"": ""5""
-                            }
-                        ]
-                    }")
-                    .WithHeader("Content-Type", "application/json"));
         }
 
         public void Dispose()
         {
-            _wireMockServer.Stop();
             _httpClient.Dispose();
+        }
+
+        [Fact]
+        public void Should_Load_Configuration()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddUserSecrets<ShippingService>()
+                .Build();
+
+            var apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"];
+            var accessToken = configuration["FreteApiConfig:AccessToken"];
+
+            Assert.NotNull(apiBaseUrl);
+            Assert.NotNull(accessToken);
         }
 
         [Fact]
@@ -74,15 +58,17 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
         {
             var simulacaoDto = new SimulacaoDto
             {
-                Origem = "12345678",
-                Destino = "87654321"
+                Origem = "19906150",
+                Destino = "59152180"
             };
 
             var result = await _shippingService.CalcularFrete(simulacaoDto);
 
             Assert.True(result.IsSuccess);
-            Assert.Equal(320.68m, result.Value.ShippingPrice);
-            Assert.Equal(5, result.Value.OriginalDeliveryTime);
+
+            Assert.NotNull(result.Value);
+            Assert.True(result.Value.ShippingPrice > 0);
+            Assert.True(result.Value.OriginalDeliveryTime > 0);
         }
     }
 }

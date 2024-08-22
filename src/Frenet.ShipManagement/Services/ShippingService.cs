@@ -20,10 +20,10 @@ namespace Frenet.ShipManagement.Services
 
         public ShippingService(HttpClient httpClient, IConfiguration configuration, ILogger<ShippingService> logger)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpClient = httpClient;
             _apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"] ?? throw new ArgumentNullException("FreteApiBaseUrl não configurada.");
             _accessToken = configuration["FreteApiConfig:AccessToken"] ?? throw new ArgumentNullException("AccessToken não configurado.");
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
         }
 
         public async Task<Result<ShippingResponse>> CalcularFrete(SimulacaoDto cotacao)

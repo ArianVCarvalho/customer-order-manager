@@ -23,11 +23,14 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
       }
     }
     ```
+     Substitua os valores pelos detalhes do seu banco de dados.
+
 3. **Adicione em suas `secrets.json` no visual studio ou em `.NET User Secrets` se for rodar a aplicação no rider** os seguintes dados
     ```json
-        "FreteApiConfig": {
+    {    
+    "FreteApiConfig": {
         "FreteApiBaseUrl": "http://api.frenet.com.br",
-        "AccessToken": "FEB32938R22E9R4749R8631R28A4CBC5B366" //ou utilize seu proprio access token
+        "AccessToken": "FEB32938R22E9R4749R8631R28A4CBC5B366"
       },
       "Authentication": {
         "Secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMjAyNC0wOC0xOCIsImRlc2NyaWNhbyI6InRlc3RlIHByYXRpY28ifQ.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -35,16 +38,13 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
         "Audience": "Frenet.ShipManagementClient",
         "ExpiresInMinutes": 60
       }
+    }
     ```
 
-    Substitua os valores pelos detalhes do seu banco de dados e as configurações do JWT.
-
-2. **Configure o NLog**
-
-   O NLog está configurado para registrar mensagens no console. Certifique-se de que o arquivo `NLog.config` ou as configurações de log estejam apropriados para o seu ambiente.
+   
 
 ## Inicialização do Projeto
-
+Acesse `src/Frenet.ShipManagement`
 1. **Restaure os pacotes NuGet**:
 
     Abra o terminal ou prompt de comando e navegue até o diretório do projeto. Execute o seguinte comando:
@@ -53,44 +53,28 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
     dotnet restore
     ```
 
-2. **Crie e aplique as migrações** se estiver usando Entity Framework:
-
-    ```bash
-    dotnet ef migrations add InitialCreate
-    dotnet ef database update
-    ```
-
-
-3. **Compile o projeto**:
+2. **Compile o projeto**:
 
     ```bash
     dotnet build
     ```
 
-4. **Execute a aplicação**:
+3. **Execute a aplicação**:
 
     ```bash
     dotnet run
     ```
 
-## Verificação
+## Como obter o JWT
 
-1. **Acesse a Swagger UI** (se em ambiente de desenvolvimento) para verificar a documentação da API:
-
-    Navegue até `https://localhost:5001/swagger` ou o endpoint definido no `app.UseSwaggerUI()`.
-
-2. **Teste as rotas da API** usando ferramentas como Postman ou diretamente na interface Swagger para garantir que tudo esteja funcionando conforme esperado.
-
-## Acesso à Aplicação
-
-Para obter um JWT e acessar a aplicação, siga estas etapas:
+Para obter o JWT e acessar a aplicação, siga estas etapas:
 
 1. **Faça login** usando as credenciais padrão hardcoded no código-fonte:
 
    - **Email**: `uncle.bob@frenet.com.br`
    - **Senha**: `QK8uZ*ZorO46`
 
-   Faça uma requisição POST para o endpoint de autenticação, normalmente algo como `/api/login`. Você receberá um token JWT em resposta.
+   Faça uma requisição POST para o endpoint de autenticação, no endpoint `/api/login`. Você receberá um token JWT em resposta.
 
 2. **Use o JWT** obtido para acessar as rotas protegidas da API. Adicione o token ao cabeçalho de autorização das suas requisições usando o formato `{token}`.
 
@@ -104,6 +88,7 @@ Para obter um JWT e acessar a aplicação, siga estas etapas:
 Este projeto utiliza testes unitários para garantir que as funcionalidades dos serviços. Para configurar e executar os testes, siga as etapas abaixo.
 
 ### Configuração dos Testes
+Acesse Acesse `tests/Frenet.ShipManagement.UnitTests`
 
 1. **Certifique-se de que todas as dependências estão instaladas ao acessar o projeto de teste**:
    O projeto utiliza o framework `xUnit` e a biblioteca `FluentAssertions` para os testes unitários. As dependências podem ser instaladas com os seguintes comandos:
@@ -124,29 +109,27 @@ Este projeto utiliza testes unitários para garantir que as funcionalidades dos s
      ```bash
      dotnet build
      ```
- 3. Acesse o projeto `Frenet.ShipManagement.UnitTests` e execute
+ 3. para rodar os testes execute
     ```bash
      dotnet test
      ```
 ---
-# Documentação para Rodar Testes de Integração
+# Testes de Integração
 
-Esta documentação fornece instruções para executar os testes de integração no projeto.
-
+Este projeto utiliza testes de integração para garantir que as funcionalidades dos serviços estejam funcionando conforme o esperado. Siga as etapas abaixo para configurar e executar os testes de integração.
 ## Requisitos
 
 Antes de executar os testes de integração, certifique-se de que você tenha o seguinte configurado:
 
 - **.NET SDK** instalado (preferencialmente .NET 8).
-- **Docker** instalado e em execução para suportar o Testcontainers.
+- **Docker** instalado e ter 2gb de ram configurado, o mesmo deve estar em execução para suportar o Testcontainers.
 - **Testcontainers.MsSql** e outras dependências de teste devem estar incluídas no projeto.
 
 ## Configuração do Ambiente
-
+Acesse `tests/Frenet.ShipManagement.IntegrationTests` 
 1. **Instale as Dependências do Projeto**
-
    Certifique-se de que todas as dependências necessárias para os testes estão instaladas. Execute o seguinte comando no diretório do projeto:
-
+ 
    ```bash
    dotnet restore
     ```
