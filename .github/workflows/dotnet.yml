@@ -32,6 +32,9 @@ jobs:
     needs: unit-tests
     name: Integration Tests
     runs-on: ubuntu-latest
+    env:
+      FRETE_API_BASE_URL: ${{ secrets.FRETE_API_BASE_URL }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET

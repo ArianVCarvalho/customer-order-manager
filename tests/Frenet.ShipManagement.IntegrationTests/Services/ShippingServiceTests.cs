@@ -23,7 +23,8 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
             _httpClient = new HttpClient();
 
             var configuration = new ConfigurationBuilder()
-                .AddUserSecrets<ShippingService>() 
+                .AddUserSecrets<ShippingService>()  // Carrega segredos do User Secrets
+                .AddEnvironmentVariables()           // Carrega variáveis de ambiente
                 .Build();
 
             var apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"]
@@ -43,7 +44,8 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
         public void Should_Load_Configuration()
         {
             var configuration = new ConfigurationBuilder()
-                .AddUserSecrets<ShippingService>()
+                .AddUserSecrets<ShippingService>()  
+                .AddEnvironmentVariables()
                 .Build();
 
             var apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"];
