@@ -41,6 +41,10 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+    - name: Print environment variables
+      run: |
+        echo "FRETE_API_BASE_URL=${{ secrets.FRETE_API_BASE_URL }}"
+        echo "ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}"
     - name: Workload update
       run: dotnet workload update
     - name: Aspire install
