@@ -38,13 +38,13 @@ namespace Frenet.ShipManagement.UnitTests.Services
                 new Cliente { Id = 2, Nome = "Cliente 2" }
             };
 
-            _clienteRepositoryMock.Setup(repo => repo.GetClientesAsync())
+            _clienteRepositoryMock.Setup(repo => repo.GetClientesAsync(default))
                 .ReturnsAsync(expectedClientes);
 
-            var result = await _clienteService.GetClientesAsync();
+            var result = await _clienteService.GetClientesAsync(default);
 
             result.Should().BeEquivalentTo(expectedClientes);
-            _clienteRepositoryMock.Verify(repo => repo.GetClientesAsync(), Times.Once);
+            _clienteRepositoryMock.Verify(repo => repo.GetClientesAsync(default), Times.Once);
         }
 
         [Fact]

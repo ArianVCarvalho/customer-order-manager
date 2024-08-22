@@ -14,7 +14,7 @@ using Frenet.ShipManagement.ViewModels;
 
 namespace Frenet.ShipManagement.IntegrationTests.Services
 {
-    public class ShippingServiceTests : IAsyncLifetime
+    public class ShippingServiceTests : IDisposable
     {
         private WireMockServer _wireMockServer;
         private HttpClient _httpClient;
@@ -26,10 +26,7 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
         {
             // Criação do mock do logger
             _logger = new LoggerFactory().CreateLogger<ShippingService>();
-        }
 
-        public async Task InitializeAsync()
-        {
             // Inicializa o WireMockServer
             _wireMockServer = WireMockServer.Start();
             _apiBaseUrl = $"http://localhost:{_wireMockServer.Ports[0]}";
@@ -66,7 +63,7 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
                     .WithHeader("Content-Type", "application/json"));
         }
 
-        public async Task DisposeAsync()
+        public void Dispose()
         {
             _wireMockServer.Stop();
             _httpClient.Dispose();

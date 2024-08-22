@@ -1,28 +1,28 @@
 using Frenet.ShipManagement.Data;
 using Frenet.ShipManagement.Models;
-using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Repositories;
-using Frenet.ShipManagement.Services.Interface;
+using Frenet.ShipManagement.Repositories.Interface;
 using Frenet.ShipManagement.Services;
+using Frenet.ShipManagement.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NLog.Extensions.Logging;
+using NLog.Config;
+using NLog.Targets;
 using System.Text;
 using System.Text.Json;
-using NLog;
 using LogLevel = NLog.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var config = new NLog.Config.LoggingConfiguration();
+var config = new LoggingConfiguration();
 
 // Targets where to log to: File and Console
-var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "file.txt" };
-var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+var logfile = new FileTarget("logfile") { FileName = "file.txt" };
+var logconsole = new ConsoleTarget("logconsole");
 
 // Rules for mapping loggers to targets            
 config.AddRule(LogLevel.Info, LogLevel.Fatal, logconsole);

@@ -32,7 +32,7 @@ namespace Frenet.ShipManagement.IntegrationTests.Repositories
             _pedidoRepository = new PedidoRepository(_context);
             _clienteRepository = new ClienteRepository(_context);
 
-            await _context.Database.MigrateAsync();
+            await _context.Database.EnsureCreatedAsync();
         }
 
         public async Task DisposeAsync()

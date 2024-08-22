@@ -33,7 +33,7 @@
         /// <summary>
         /// Data de criação do pedido.
         /// </summary>
-        public DateTime DataCriacao { get; init; }
+        public DateTime DataCriacao { get; init; } = DateTime.UtcNow;
 
         ///<summary>
         /// Status do pedido

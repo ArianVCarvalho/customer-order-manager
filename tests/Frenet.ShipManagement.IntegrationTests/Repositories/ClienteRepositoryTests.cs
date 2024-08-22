@@ -30,7 +30,7 @@ namespace Frenet.ShipManagement.IntegrationTests.Repositories
             _clienteRepository = new ClienteRepository(_context);
 
             // Aplica as migrations
-            await _context.Database.MigrateAsync();
+            await _context.Database.EnsureCreatedAsync();
         }
 
         public async Task DisposeAsync()
@@ -143,7 +143,7 @@ namespace Frenet.ShipManagement.IntegrationTests.Repositories
             await _clienteRepository.CreateCliente(cliente2);
 
             // Act
-            var clientes = await _clienteRepository.GetClientesAsync();
+            var clientes = await _clienteRepository.GetClientesAsync(default);
 
             // Assert
             Assert.NotEmpty(clientes);

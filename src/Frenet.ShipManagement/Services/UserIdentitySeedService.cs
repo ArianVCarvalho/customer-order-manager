@@ -36,7 +36,6 @@ namespace Frenet.ShipManagement.Services
 
             if (user != null)
             {
-                _logger.LogInformation("Usuário com o e-mail {Email} já existe.", DefaultEmail);
                 return;
             }
 

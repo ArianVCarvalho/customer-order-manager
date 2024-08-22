@@ -26,9 +26,9 @@ namespace Frenet.ShipManagement.Repositories
         /// Obtém a lista de todos os clientes.
         /// </summary>
         /// <returns>Uma lista de clientes</returns>
-        public async Task<List<Cliente>> GetClientesAsync()
+        public async Task<List<Cliente>> GetClientesAsync(CancellationToken cancellationToken)
         {
-            return await _context.Cliente.ToListAsync();
+            return await _context.Cliente.ToListAsync(cancellationToken);
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace Frenet.ShipManagement.Repositories.Interface
         /// Obtém a lista de todos os clientes.
         /// </summary>
         /// <returns>Uma lista de clientes</returns>
-        Task<List<Cliente>> GetClientesAsync();
+        Task<List<Cliente>> GetClientesAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Atualiza as informações de um cliente existente.

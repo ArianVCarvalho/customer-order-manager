@@ -104,6 +104,7 @@ namespace Frenet.ShipManagement.Repositories
         /// </summary>
         /// <param name="id">ID do pedido a ser atualizado</param>
         /// <param name="pedidoDto">Objeto PedidoDto contendo os novos dados</param>
+        /// <param name="frete">Valor do frete</param>
         /// <returns>Pedido atualizado</returns>
         public async Task<Pedido> UpdatePedido(int id, PedidoRequest pedidoDto, decimal frete)
         {

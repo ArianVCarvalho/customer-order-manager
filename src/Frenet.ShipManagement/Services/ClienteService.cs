@@ -21,18 +21,18 @@ namespace Frenet.ShipManagement.Services
         /// <param name="logger">Logger para registrar eventos e erros</param>
         public ClienteService(IClienteRepository repository, ILogger<ClienteService> logger)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _repository = repository;
+            _logger = logger;
         }
 
         /// <summary>
         /// Obtém a lista de todos os clientes.
         /// </summary>
         /// <returns>Uma lista de clientes</returns>
-        public async Task<List<Cliente>> GetClientesAsync()
+        public async Task<List<Cliente>> GetClientesAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Obtendo a lista de todos os clientes.");
-            var clientes = await _repository.GetClientesAsync();
+            _logger.LogDebug("Obtendo a lista de todos os clientes.");
+            var clientes = await _repository.GetClientesAsync(cancellationToken);
             _logger.LogInformation("Lista de clientes obtida com sucesso. Total de clientes: {Count}", clientes.Count);
             return clientes;
         }

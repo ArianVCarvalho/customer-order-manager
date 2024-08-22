@@ -40,13 +40,13 @@ namespace Frenet.ShipManagement.Controllers
         [ProducesResponseType(typeof(IEnumerable<ClienteDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             Logger.Info("Iniciando a recuperação da lista de clientes.");
 
             try
             {
-                var clientes = await _clienteService.GetClientesAsync();
+                var clientes = await _clienteService.GetClientesAsync(cancellationToken);
                 Logger.Info("Lista de clientes recuperada com sucesso.");
                 return Ok(clientes);
             }
