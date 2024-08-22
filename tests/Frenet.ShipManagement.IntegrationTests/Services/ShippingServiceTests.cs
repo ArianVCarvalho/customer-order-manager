@@ -28,8 +28,11 @@ namespace Frenet.ShipManagement.IntegrationTests.Services
                 .Build();
 
             var apiBaseUrl = configuration["FreteApiConfig:FreteApiBaseUrl"]
-                ?? throw new InvalidOperationException("FreteApiBaseUrl não configurada.");
+                ?? configuration["FRETE_API_BASE_URL"]
+                ?? throw new InvalidOperationException("apiBaseUrl não configurado.");
+
             var accessToken = configuration["FreteApiConfig:AccessToken"]
+                ?? configuration["ACCESSTOKEN"]
                 ?? throw new InvalidOperationException("AccessToken não configurado.");
 
             _shippingService = new ShippingService(_httpClient, configuration, _logger);
