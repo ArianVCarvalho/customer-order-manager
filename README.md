@@ -1,20 +1,20 @@
 
-# Sistema de Gerenciamento de Pedidos para Logística
+# Sistema de Gerenciamento de Pedidos para LogÃ­stica
 
-Este projeto é um sistema para gerenciamento de pedidos de transporte, incluindo funcionalidades para criar, atualizar, visualizar e excluir pedidos, além de gerenciar informações de clientes e calcular o frete através de uma API externa.
+Este projeto Ã© um sistema para gerenciamento de pedidos de transporte, incluindo funcionalidades para criar, atualizar, visualizar e excluir pedidos, alÃ©m de gerenciar informaÃ§Ãµes de clientes e calcular o frete atravÃ©s de uma API externa.
 
-## Pré-Requisitos
+## PrÃ©-Requisitos
 
-Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurados:
+Antes de iniciar a aplicaÃ§Ã£o, certifique-se de ter os seguintes itens configurados:
 
-- **.NET SDK** instalado (versão compatível com seu projeto, preferencialmente .NET 8).
-- **Banco de dados SQL Server** configurado e acessível.
+- **.NET SDK** instalado (versÃ£o compatÃ­vel com seu projeto, preferencialmente .NET 8).
+- **Banco de dados SQL Server** configurado e acessÃ­vel.
 - **NLog** configurado para logging.
 
-## Configuração do Ambiente
+## ConfiguraÃ§Ã£o do Ambiente
 1. Crie um banco de dados SQL SERVER e rode o scrip que consta na pasta SQL
 
-2. **Crie/altere o arquivo `appsettings.json`** na raiz do projeto com o seguinte conteúdo:
+2. **Crie/altere o arquivo `appsettings.json`** na raiz do projeto com o seguinte conteÃºdo:
 
     ```json
     {
@@ -25,15 +25,16 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
     ```
      Substitua os valores pelos detalhes do seu banco de dados.
 
-3. **Adicione em suas `secrets.json` no visual studio ou em `.NET User Secrets` se for rodar a aplicação no rider** os seguintes dados
+OBS: Crie uma conta na frenet e gere suas chaves de acess key e authentication
+3. **Adicione em suas `secrets.json` no visual studio ou em `.NET User Secrets` se for rodar a aplicaÃ§Ã£o no rider** os seguintes dados
     ```json
     {    
     "FreteApiConfig": {
         "FreteApiBaseUrl": "http://api.frenet.com.br",
-        "AccessToken": "FEB32938R22E9R4749R8631R28A4CBC5B366"
+        "AccessToken": "ADICIONE AQUI SUA ACCESS KEY"
       },
       "Authentication": {
-        "Secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiMjAyNC0wOC0xOCIsImRlc2NyaWNhbyI6InRlc3RlIHByYXRpY28ifQ.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "Secret": "ADICIONE AQUI SUA SECRET",
         "Issuer": "http://frenet.com.br",
         "Audience": "Frenet.ShipManagementClient",
         "ExpiresInMinutes": 60
@@ -43,11 +44,11 @@ Antes de iniciar a aplicação, certifique-se de ter os seguintes itens configurad
 
    
 
-## Inicialização do Projeto
+## InicializaÃ§Ã£o do Projeto
 Acesse `src/Frenet.ShipManagement`
 1. **Restaure os pacotes NuGet**:
 
-    Abra o terminal ou prompt de comando e navegue até o diretório do projeto. Execute o seguinte comando:
+    Abra o terminal ou prompt de comando e navegue atÃ© o diretÃ³rio do projeto. Execute o seguinte comando:
 
     ```bash
     dotnet restore
@@ -59,7 +60,7 @@ Acesse `src/Frenet.ShipManagement`
     dotnet build
     ```
 
-3. **Execute a aplicação**:
+3. **Execute a aplicaÃ§Ã£o**:
 
     ```bash
     dotnet run
@@ -67,30 +68,30 @@ Acesse `src/Frenet.ShipManagement`
 
 ## Como obter o JWT
 
-Para obter o JWT e acessar a aplicação, siga estas etapas:
+Para obter o JWT e acessar a aplicaÃ§Ã£o, siga estas etapas:
 
-1. **Faça login** usando as credenciais padrão hardcoded no código-fonte:
+1. **FaÃ§a login** usando as credenciais padrÃ£o hardcoded no cÃ³digo-fonte:
 
    - **Email**: `uncle.bob@frenet.com.br`
    - **Senha**: `QK8uZ*ZorO46`
 
-   Faça uma requisição POST para o endpoint de autenticação, no endpoint `/api/login`. Você receberá um token JWT em resposta.
+   FaÃ§a uma requisiÃ§Ã£o POST para o endpoint de autenticaÃ§Ã£o, no endpoint `/api/login`. VocÃª receberÃ¡ um token JWT em resposta.
 
-2. **Use o JWT** obtido para acessar as rotas protegidas da API. Adicione o token ao cabeçalho de autorização das suas requisições usando o formato `{token}`.
+2. **Use o JWT** obtido para acessar as rotas protegidas da API. Adicione o token ao cabeÃ§alho de autorizaÃ§Ã£o das suas requisiÃ§Ãµes usando o formato `{token}`.
 
 ## Logging e Monitoramento
 
-- **Verifique os logs** gerados no console para assegurar que a aplicação está registrando informações corretamente.
+- **Verifique os logs** gerados no console para assegurar que a aplicaÃ§Ã£o estÃ¡ registrando informaÃ§Ãµes corretamente.
 - 
 ---
-## Testes Unitários
+## Testes UnitÃ¡rios
 
-Este projeto utiliza testes unitários para garantir que as funcionalidades dos serviços estejam funcionando corretamente. Para configurar e executar os testes, siga as etapas abaixo.
+Este projeto utiliza testes unitÃ¡rios para garantir que as funcionalidades dos serviÃ§os estejam funcionando corretamente. Para configurar e executar os testes, siga as etapas abaixo.
 
-### Configuração dos Testes
+### ConfiguraÃ§Ã£o dos Testes
 Acesse Acesse `tests/Frenet.ShipManagement.UnitTests`
 
-1.  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+1.  Antes de executar os testes, compile o projeto para garantir que tudo estÃ¡ construÃ­do corretamente:
      ```bash
      dotnet build
      ```
@@ -99,21 +100,21 @@ Acesse Acesse `tests/Frenet.ShipManagement.UnitTests`
      dotnet test
      ```
 ---
-# Testes de Integração
+# Testes de IntegraÃ§Ã£o
 
-Este projeto utiliza testes de integração para garantir que as funcionalidades dos serviços estejam funcionando conforme o esperado. Siga as etapas abaixo para configurar e executar os testes de integração.
+Este projeto utiliza testes de integraÃ§Ã£o para garantir que as funcionalidades dos serviÃ§os estejam funcionando conforme o esperado. Siga as etapas abaixo para configurar e executar os testes de integraÃ§Ã£o.
 ## Requisitos
 
-Antes de executar os testes de integração, certifique-se de que você tenha o seguinte configurado:
+Antes de executar os testes de integraÃ§Ã£o, certifique-se de que vocÃª tenha o seguinte configurado:
 
 - **.NET SDK** instalado (preferencialmente .NET 8).
-- **Docker** instalado e ter 2gb de ram configurado, o mesmo deve estar em execução para suportar o Testcontainers.
-- **Testcontainers.MsSql** e outras dependências de teste devem estar incluídas no projeto.
+- **Docker** instalado e ter 2gb de ram configurado, o mesmo deve estar em execuÃ§Ã£o para suportar o Testcontainers.
+- **Testcontainers.MsSql** e outras dependÃªncias de teste devem estar incluÃ­das no projeto.
 
-## Configuração do Ambiente
+## ConfiguraÃ§Ã£o do Ambiente
 Acesse `tests/Frenet.ShipManagement.IntegrationTests` 
-1. **Instale as Dependências do Projeto**
-   Certifique-se de que todas as dependências necessárias para os testes estão instaladas. Execute o seguinte comando no diretório do projeto:
+1. **Instale as DependÃªncias do Projeto**
+   Certifique-se de que todas as dependÃªncias necessÃ¡rias para os testes estÃ£o instaladas. Execute o seguinte comando no diretÃ³rio do projeto:
  
    ```bash
    dotnet restore
@@ -122,205 +123,17 @@ Acesse `tests/Frenet.ShipManagement.IntegrationTests`
 
 3. Executando
  Compile o projeto 
-  Antes de executar os testes, compile o projeto para garantir que tudo está construído corretamente:
+  Antes de executar os testes, compile o projeto para garantir que tudo estÃ¡ construÃ­do corretamente:
     ```bash
        dotnet build
       ```
 4. Execute os testes
-    Use o seguinte comando para rodar os testes de integração com xUnit:
+    Use o seguinte comando para rodar os testes de integraÃ§Ã£o com xUnit:
     ```bash
        dotnet test
       ```
-
-
----
-# Tecnologias 
-- **Linguagem de Programação:** C#
-- **Framework:** .NET 8.0
-- **Banco de Dados:** Microsoft SQL Server
-- **Documentação de API:** Swagger/OpenAPI
-- **Logging:** NLog
-- **Controle de Versão:** Git
-- **Testes:** Unitários e de Integração
-- **Docker:** Para realizar os testes de integração
----
-
----
-# Questionário - Avaliação de Programador Backend (.NET C#) Pleno
-
-#### **Seção 1: C# e Desenvolvimento de API RESTful**
-
-1. **Qual o principal benefício do uso de Dependency Injection (DI) no desenvolvimento com ASP.NET Core?**
-   - a) Reduz a quantidade de memória usada
-   - b) Melhora a performance do código
-   - **c) Facilita a criação de testes unitários e promove a modularidade do código**
-   - d) Aumenta a quantidade de código escrito
-
-2. **Ao desenvolver uma API RESTful em ASP.NET Core, qual código de resposta HTTP deve ser retornado para uma requisição de recurso que não foi encontrado?**
-   - a) 200 OK
-   - b) 400 Bad Request
-   - **c) 404 Not Found**
-   - d) 500 Internal Server Error
-
-3. **No contexto de APIs RESTful, o que significa o termo "Idempotência"?**
-   - a) A ação de garantir que todas as requisições HTTP sejam seguras
-   - **b) O comportamento de métodos que podem ser repetidos sem efeitos colaterais adicionais**
-   - c) A capacidade de uma API de suportar várias versões
-   - d) O processo de cache de respostas para melhorar a performance
-
-4. **Em ASP.NET Core, qual é a finalidade do atributo `[HttpGet]`?**
-   - a) Definir um método como seguro
-   - **b) Indicar que um método manipula requisições GET**
-   - c) Garantir que o método retorne sempre uma string
-   - d) Definir a resposta como JSON
-
-5. **Qual é o principal propósito de usar o Entity Framework Core ao desenvolver com .NET?**
-   - a) Aumentar a velocidade de processamento da aplicação
-   - b) Facilitar a manipulação de arquivos no sistema de arquivos
-   - c) Gerar consultas SQL manualmente
-   - **d) Mapear objetos de domínio para tabelas de banco de dados relacional**
-
-6. **Quando uma API RESTful deve usar o método HTTP PUT em vez de POST?**
-   - a) Quando se deseja criar um novo recurso
-   - **b) Quando se deseja atualizar ou criar um recurso em uma URI específica**
-   - c) Quando se deseja excluir um recurso
-   - d) Quando se deseja enviar dados sem persistência
-
-7. **Em APIs RESTful, o que é HATEOAS (Hypermedia as the Engine of Application State)?**
-   - a) Um padrão para documentação de APIs
-   - b) Um tipo de autenticação para APIs
-   - **c) Um princípio que descreve a navegação baseada em hipermídia nas respostas da API**
-   - d) Uma técnica para compressão de dados JSON
-
-8. **Qual a diferença entre `IEnumerable<T>` e `IQueryable<T>` em C#?**
-   - a) `IEnumerable<T>` executa consultas diretamente no banco de dados
-   - **b) `IQueryable<T>` permite a execução de consultas no banco de dados, enquanto `IEnumerable<T>` realiza consultas na memória**
-   - c) `IQueryable<T>` é usado apenas com listas
-   - d) `IEnumerable<T>` sempre retorna resultados de forma assíncrona
-
-9. **Qual é a vantagem de usar async/await no C# em APIs RESTful?**
-   - a) Reduz o tamanho do código escrito
-   - **b) Melhora a performance de I/O, permitindo a execução assíncrona de tarefas sem bloquear a thread principal**
-   - c) Permite a execução de código paralelo
-   - d) Diminui a quantidade de erros em tempo de execução
-
-10. **Qual é o padrão mais adequado para a versão de uma API RESTful?**
-    - a) Usar a versão no cabeçalho HTTP
-    - **b) Incluir a versão como parte da URL**
-    - c) Não é necessário versionar APIs RESTful
-    - d) Depende do tipo de autenticação usada
-
-11. **Ao configurar um serviço em ASP.NET Core, qual é a diferença entre `AddScoped`, `AddSingleton` e `AddTransient`?**
-    - **a) `AddScoped` cria uma instância por requisição, `AddSingleton` uma instância única e `AddTransient` uma nova instância a cada solicitação**
-    - b) `AddScoped` cria uma instância por aplicação, `AddSingleton` uma instância por requisição, e `AddTransient` nunca cria instâncias
-    - c) Todos são equivalentes e a escolha depende do gosto do desenvolvedor
-    - d) `AddSingleton` sempre cria uma instância por sessão
-
-12. **Como utilizar o atributo `[Route("api/[controller]")]` em ASP.NET Core?**
-    - a) Definir um caminho específico para todos os métodos em um controlador
-    - b) Configurar o controlador para responder a todas as rotas
-    - **c) Definir o prefixo de rota para todos os métodos do controlador**
-    - d) Restringir o controlador para responder apenas a métodos POST
-
-#### **Seção 2: Banco de Dados Microsoft SQL Server**
-
-1. **O que significa a sigla ACID no contexto de transações em banco de dados?**
-   - **a) Atomicidade, Consistência, Isolamento, Durabilidade**
-   - b) Adaptação, Confiabilidade, Independência, Desempenho
-   - c) Acessibilidade, Controle, Integridade, Distribuição
-   - d) Asynchronous, Cache, Indexing, Durability
-
-2. **Qual é o comando SQL para criar uma nova tabela em um banco de dados Microsoft SQL Server?**
-   - a) `CREATE NEW TABLE`
-   - b) `INSERT TABLE`
-   - **c) `CREATE TABLE`**
-   - d) `ADD TABLE`
-
-3. **Qual comando SQL é usado para retornar apenas registros distintos em uma consulta?**
-   - a) `UNIQUE`
-   - **b) `SELECT DISTINCT`**
-   - c) `SELECT UNIQUE`
-   - d) `FILTER DISTINCT`
-
-4. **Qual é o propósito do comando `JOIN` em SQL?**
-   - **a) Combinar dados de duas ou mais tabelas**
-   - b) Excluir registros duplicados
-   - c) Filtrar registros com base em uma condição
-   - d) Modificar a estrutura de uma tabela
-
-5. **Qual é a diferença entre uma `PRIMARY KEY` e uma `FOREIGN KEY` em SQL?**
-   - **a) Uma `PRIMARY KEY` identifica exclusivamente um registro em uma tabela, enquanto uma `FOREIGN KEY` refere-se a uma `PRIMARY KEY` em outra tabela**
-   - b) Ambas são usadas para criar índices em uma tabela
-   - c) Uma `FOREIGN KEY` cria uma nova tabela, enquanto uma `PRIMARY KEY` define o tipo de dados de uma coluna
-   - d) Não há diferença, ambas são a mesma coisa
-
-6. **Qual dos seguintes tipos de índices pode melhorar o desempenho de consultas em colunas que possuem valores duplicados?**
-   - a) Índice Clustered
-   - **b) Índice Não Clustered**
-   - c) Índice Único
-   - d) Índice de Texto Completo
-
-7. **Como você pode garantir que uma coluna em uma tabela SQL Server não aceitará valores nulos?**
-   - **a) Definindo a coluna como `NOT NULL`**
-   - b) Usando `NULLABLE FALSE`
-   - c) Aplicando uma `PRIMARY KEY` na coluna
-   - d) Aplicando um índice único na coluna
-
-8. **Qual é o propósito da cláusula `GROUP BY` em uma consulta SQL?**
-   - a) Organizar os dados em ordem crescente
-   - b) Filtrar registros duplicados
-   - **c) Agrupar registros que têm os mesmos valores em colunas específicas**
-   - d) Ordenar os registros com base em um campo específico
-
-9. **No SQL Server, qual é a função do comando `TRIGGER`?**
-   - **a) Executar uma ação quando um evento específico ocorre em uma tabela**
-   - b) Fazer backup automático de uma tabela
-   - c) Restaurar dados em uma tabela
-   - d) Indexar automaticamente uma coluna
-
-10. **Qual é a finalidade de usar a palavra-chave `WITH (NOLOCK)` em uma consulta SQL Server?**
-    - a) Ignorar as permissões de segurança para acessar a tabela
-    - **b) Ler os dados sem adquirir bloqueios, evitando possíveis deadlocks**
-    - c) Excluir temporariamente os índices
-    - d) Bloquear outras consultas até que a atual seja concluída
-
-11. **Qual é o resultado de executar o seguinte código SQL?**
-    ```sql
-    SELECT COUNT(*) FROM Tabela WHERE Coluna IS NULL;
-    ```
-    - a) Retorna o número total de registros na tabela
-    - **b) Retorna o número de registros onde a coluna é nula**
-    - c) Exclui os registros onde a coluna é nula
-    - d) Retorna todos os registros que não possuem valores nulos
-
-12. **Como você pode alterar o nome de uma coluna em uma tabela existente no SQL Server?**
-    - a) `ALTER COLUMN`
-    - b) `RENAME COLUMN`
-    - c) `UPDATE COLUMN`
-    - **d) `SP_RENAME`**
-
-#### **Seção 3: Swagger/OpenAPI**
-
-1. **O que é o Swagger/OpenAPI?**
-   - a) Um framework para autenticação de APIs
-   - **b) Um padrão para modelar e documentar APIs RESTful**
-   - c) Um sistema de cache para APIs
-   - d) Um banco de dados em tempo real
-
-2. **Qual a principal vantagem de usar o Swagger para documentação de APIs?**
-   - **a) Gerar código automaticamente para diferentes linguagens**
-   - b) Aumentar a performance da API
-   - c) Automatizar a autenticação da API
-   - d) Controlar o acesso de usuários à API
-
-3. **Como você pode adicionar a documentação Swagger a uma API ASP.NET Core?**
-   - **a) Instalando o pacote `Swashbuckle.AspNetCore` e configurando-o no `Startup.cs`**
-   - b) Escrevendo manualmente o código Swagger em um arquivo `.json`
-   - c) Usando o atributo `[SwaggerDocument]` nos métodos
-   - d) Configurando o Swagger diretamente na interface do Visual Studio
-
-4. **O que é um contrato OpenAPI?**
+4. **O que Ã© um contrato OpenAPI?**
    - a) Um contrato legal para o uso de uma API
-   - **b) Uma especificação para descrever a interface de uma API RESTful, incluindo métodos, parâmetros e respostas**
-   - c) Um arquivo de configuração para a segurança da API
-   - d) Um módulo de segurança em APIs RESTful
+   - **b) Uma especificaÃ§Ã£o para descrever a interface de uma API RESTful, incluindo mÃ©todos, parÃ¢metros e respostas**
+   - c) Um arquivo de configuraÃ§Ã£o para a seguranÃ§a da API
+   - d) Um mÃ³dulo de seguranÃ§a em APIs RESTful
